@@ -89,6 +89,7 @@ void *doInChildThread(void *ptr) {
     char tmp_buf[BUFF_SIZE] = {};
     char file_buf[BUFF_SIZE] = {};
     char dir_name[BUFF_SIZE] = {};
+    size_t input_size = 2;
 
     strcpy(Message,"Hello World!!\n");
     sent = send(remoteSocket,Message,strlen(Message),0);
@@ -105,10 +106,6 @@ void *doInChildThread(void *ptr) {
                 input_vec.push_back(string(tmp_str));
                 tmp_str = strtok(NULL, " ");
             }
-
-            for(int i = 0; i < input_vec.size(); i++)
-                printf("%s\n", input_vec[i].c_str());
-            printf("%d\n", input_vec.size());
 
             if(strcmp(receiveMessage, "exit") == 0)
                 break;
@@ -135,7 +132,7 @@ void *doInChildThread(void *ptr) {
                 send(remoteSocket,Message,strlen(Message),0);
             }
 
-            else if((strcmp(input_vec[0].c_str(), "put") == 0) && input_vec.size() == 2) {
+            else if((strcmp(input_vec[0].c_str(), "put") == 0) && input_vec.size() == input_size) {
                 bzero(receiveMessage,sizeof(char)*BUFF_SIZE);
                 if((recved = recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0)) > 0) {
                     if(strcmp(receiveMessage, "file exists") == 0) {
@@ -168,7 +165,7 @@ void *doInChildThread(void *ptr) {
             }
 
             else if(strcmp(input_vec[0].c_str(), "get") == 0) {
-                if(input_vec.size() == 2) {
+                if(input_vec.size() == input_size) {
                     int flag = 0;
                     struct dirent *pDirent;
                     DIR *pDir;
