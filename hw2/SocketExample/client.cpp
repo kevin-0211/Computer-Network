@@ -193,7 +193,8 @@ int main(int argc , char *argv[])
                         }
 
                         namedWindow("CV Video Client",1);
-                        
+                        printf("TTTTTRue\n");
+
                         while(1) {
 
                             if ((nbytes = recv(localSocket, iptr, imgSize , MSG_WAITALL)) == -1) {
