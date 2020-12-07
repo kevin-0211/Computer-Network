@@ -92,6 +92,9 @@ int main(int argc , char *argv[])
                 tmp_str = strtok(NULL, " ");
             }
 
+            for(int i = 0; i < input_vec.size(); i++)
+                printf("%s\n", input_vec[0].c_str());
+
             if(strcmp(input, "exit") == 0)
                 break;
 
