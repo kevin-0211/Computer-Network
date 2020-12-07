@@ -186,8 +186,6 @@ int main(int argc , char *argv[])
                         Mat imgClient;
                         imgClient = Mat::zeros(540, 960, CV_8UC3);
 
-                        int imgSize = imgClient.total() * imgClient.elemSize();
-                        uchar *iptr = imgClient.data;
                         int nbytes;
 
                         if(!imgClient.isContinuous()){
@@ -196,7 +194,9 @@ int main(int argc , char *argv[])
 
 
                         while(1) {
-
+                            int imgSize = imgClient.total() * imgClient.elemSize();
+                            uchar *iptr = imgClient.data;
+                            
                             if ((nbytes = recv(localSocket, iptr, imgSize , MSG_WAITALL)) == -1) {
                                 std::cerr << "recv failed, received bytes = " << nbytes << std::endl;
                             }
