@@ -262,12 +262,18 @@ void *doInChildThread(void *ptr) {
                             imgServer = imgServer.clone();
                         }
 
-                        int imgSize = imgServer.total() * imgServer.elemSize();
                         int nbytes;
 
                         while(1) {      
+                            int imgSize = imgServer.total() * imgServer.elemSize();
                             /* get a frame from camera */
                             cap >> imgServer;
+                            imshow("Video", imgServer);
+
+                            char c = (char)waitKey(33.3333);
+                            if(c==27)
+                                    break;
+                            }
                                 
                             if ((nbytes = send(remoteSocket, imgServer.data, imgSize, 0)) < 0){
                                 std::cerr << "bytes = " << nbytes << std::endl;
@@ -275,6 +281,7 @@ void *doInChildThread(void *ptr) {
                             } 
                         }
                         cap.release();
+                        destroyAllWindows();
 
                         recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
                         bzero(Message,sizeof(char)*BUFF_SIZE);
