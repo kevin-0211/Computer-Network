@@ -132,11 +132,12 @@ void *doInChildThread(void *ptr) {
             }
 
             else if((strcmp(input_vec[0].c_str(), "put") == 0) && (input_vec.size() == 2)) {
-                printf("Haiya!!\n");
+                
                 bzero(receiveMessage,sizeof(char)*BUFF_SIZE);
                 if((recved = recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0)) > 0) {
+                    printf("message = %s\n", receiveMessage);
                     if(strcmp(receiveMessage, "file exists") == 0) {
-                        printf("exists\n");
+                        
                         bzero(dir_name,sizeof(char)*BUFF_SIZE);
                         strcpy(dir_name, "./server_dir/");
                         strcat(dir_name, input_vec[1].c_str());
