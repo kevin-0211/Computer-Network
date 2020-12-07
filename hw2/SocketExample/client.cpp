@@ -194,8 +194,6 @@ int main(int argc , char *argv[])
                             imgClient = imgClient.clone();
                         }
 
-                        namedWindow("CV Video Client",1);
-
 
                         while(1) {
 

@@ -241,7 +241,7 @@ void *doInChildThread(void *ptr) {
                         }
                     }
                     closedir(pDir);
-                    
+
                     if(flag == 1) {
                         bzero(Message,sizeof(char)*BUFF_SIZE);
                         strcpy(Message, "file exists");
@@ -269,13 +269,13 @@ void *doInChildThread(void *ptr) {
                             /* get a frame from camera */
                             cap >> imgServer;
                                 
-                            //send processed image
                             if ((nbytes = send(remoteSocket, imgServer.data, imgSize, 0)) < 0){
                                 std::cerr << "bytes = " << nbytes << std::endl;
                                 break;
                             } 
                         }
-                                  
+                        cap.release();
+
                         recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
                         bzero(Message,sizeof(char)*BUFF_SIZE);
                         strcpy(Message, "Video play complete.");
