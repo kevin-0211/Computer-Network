@@ -11,13 +11,27 @@
 #include <dirent.h>
 #include <vector>
 #include <pthread.h>
+#include <errno.h>
 
 #define BUFF_SIZE 1024
 
 using namespace std;
 int main(int argc , char *argv[])
 {   
-    int serverPort = atoi(argv[1]);
+    vector<string> arg;
+    char* tmp_str = strtok(argv[1], ":");
+    while(tmp_str != NULL) {
+        arg.push_back(string(tmp_str));
+        tmp_str = strtok(NULL, " ");
+    }
+    if(arg.size() != 2) {
+        printf("Format error.\n");
+        return 0;
+    }
+
+    char serverIP[BUFF_SIZE] = {};
+    strcpy(serverIP, arg[0].c_str());
+    int serverPort = atoi(arg[1].c_str());
     int localSocket, recved;
     localSocket = socket(AF_INET , SOCK_STREAM , 0);
 
@@ -30,7 +44,7 @@ int main(int argc , char *argv[])
     bzero(&info,sizeof(info));
 
     info.sin_family = PF_INET;
-    info.sin_addr.s_addr = inet_addr("127.0.0.1");
+    info.sin_addr.s_addr = inet_addr(serverIP);
     info.sin_port = htons(serverPort);
 
 
@@ -39,6 +53,7 @@ int main(int argc , char *argv[])
         printf("Connection error\n");
         return 0;
     }
+
 
     char receiveMessage[BUFF_SIZE] = {};
     char input[BUFF_SIZE] = {};
@@ -63,6 +78,8 @@ int main(int argc , char *argv[])
             bzero(input,sizeof(char)*BUFF_SIZE);
             bzero(Message,sizeof(char)*BUFF_SIZE);
             cin.getline(input, BUFF_SIZE);
+            if (strlen(input) == 0)
+                continue;
             strcpy(Message, input);
             send(localSocket, Message, strlen(Message), 0);
 
