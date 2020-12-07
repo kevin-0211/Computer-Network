@@ -132,7 +132,7 @@ void *doInChildThread(void *ptr) {
                 send(remoteSocket,Message,strlen(Message),0);
             }
 
-            else if((strcmp(input_vec[0].c_str(), "put") == 0) && input_vec.size() == input_size) {
+            else if((strcmp(input_vec[0].c_str(), "put") == 0) && input_vec.size() == 2) {
                 bzero(receiveMessage,sizeof(char)*BUFF_SIZE);
                 if((recved = recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0)) > 0) {
                     if(strcmp(receiveMessage, "file exists") == 0) {
@@ -165,7 +165,7 @@ void *doInChildThread(void *ptr) {
             }
 
             else if(strcmp(input_vec[0].c_str(), "get") == 0) {
-                if(input_vec.size() == input_size) {
+                if(input_vec.size() == 2) {
                     int flag = 0;
                     struct dirent *pDirent;
                     DIR *pDir;
