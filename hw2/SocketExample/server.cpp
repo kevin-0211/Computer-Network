@@ -89,7 +89,6 @@ void *doInChildThread(void *ptr) {
     char tmp_buf[BUFF_SIZE] = {};
     char file_buf[BUFF_SIZE] = {};
     char dir_name[BUFF_SIZE] = {};
-    size_t input_size = 2;
 
     strcpy(Message,"Hello World!!\n");
     sent = send(remoteSocket,Message,strlen(Message),0);
@@ -107,6 +106,7 @@ void *doInChildThread(void *ptr) {
                 tmp_str = strtok(NULL, " ");
             }
 
+            cout << input_vec.size() << endl;
             if(strcmp(receiveMessage, "exit") == 0)
                 break;
 

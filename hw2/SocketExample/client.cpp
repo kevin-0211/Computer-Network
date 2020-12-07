@@ -61,7 +61,6 @@ int main(int argc , char *argv[])
     char file_buf[BUFF_SIZE] = {};
     char dir_name[BUFF_SIZE] = {};
     int sent;
-    size_t input_size = 2;
     
     while(1){
         bzero(receiveMessage,sizeof(char)*BUFF_SIZE);
@@ -97,7 +96,7 @@ int main(int argc , char *argv[])
             if(strcmp(input, "exit") == 0)
                 break;
 
-            if((strcmp(input_vec[0].c_str(), "put") == 0) && input_vec.size() == input_size){              
+            if((strcmp(input_vec[0].c_str(), "put") == 0) && input_vec.size() == 2){              
                 int flag = 0;
                 struct dirent *pDirent;
                 DIR *pDir;
@@ -141,7 +140,7 @@ int main(int argc , char *argv[])
                 }
             }
 
-            if((strcmp(input_vec[0].c_str(), "get") == 0) && input_vec.size() == input_size) {
+            if((strcmp(input_vec[0].c_str(), "get") == 0) && input_vec.size() == 2) {
                 bzero(receiveMessage,sizeof(char)*BUFF_SIZE);
                 if ((recved = recv(localSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0)) > 0) {
                     if(strcmp(receiveMessage, "file exists") == 0) {
