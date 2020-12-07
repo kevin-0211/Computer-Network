@@ -93,7 +93,7 @@ int main(int argc , char *argv[])
             }
 
             for(int i = 0; i < input_vec.size(); i++)
-                printf("%s\n", input_vec[0].c_str());
+                printf("%s\n", input_vec[i].c_str());
 
             if(strcmp(input, "exit") == 0)
                 break;
