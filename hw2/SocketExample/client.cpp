@@ -12,6 +12,7 @@
 #include <vector>
 #include <pthread.h>
 #include <errno.h>
+#include "opencv2/opencv.hpp"
 
 #define BUFF_SIZE 1024
 
@@ -161,6 +162,47 @@ int main(int argc , char *argv[])
                         fclose(fp);
                         bzero(Message, sizeof(char)*BUFF_SIZE);
                         strcpy(Message, "download complete");
+                        send(localSocket, Message, strlen(Message), 0);
+                    }
+                    else {
+                        bzero(Message, sizeof(char)*BUFF_SIZE);
+                        strcpy(Message, "file doesn't exist");
+                        send(localSocket, Message, strlen(Message), 0);
+                    }
+                }
+            }
+
+            if((strcmp(input_vec[0].c_str(), "play") == 0) && input_vec.size() == 2) {
+                if ((recved = recv(localSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0)) > 0) {
+                    if(strcmp(receiveMessage, "file exists") == 0) {
+                        Mat imgClient;
+                        imgClient = Mat::zeros(540, 960, CV_8UC3);
+
+                        int imgSize = imgClient.total() * imgClient.elemSize();
+                        uchar *iptr = imgClient.data;
+                        int nbytes;
+
+                        if(!imgClient.isContinuous()){
+                            imgClient = imgClient.clone();
+                        }
+
+                        while(1) {
+
+                            if ((nbytes = recv(localSocket, iptr, imgSize , MSG_WAITALL)) == -1) {
+                                std::cerr << "recv failed, received bytes = " << bytes << std::endl;
+                            }
+                            
+                            imshow("Video", imgClient); 
+                          
+                            char c = (char)waitKey(33.3333);
+                            if(c == 27)
+                                break;
+                        }   
+                        destroyAllWindows();
+
+
+                        bzero(Message, sizeof(char)*BUFF_SIZE);
+                        strcpy(Message, "play complete");
                         send(localSocket, Message, strlen(Message), 0);
                     }
                     else {

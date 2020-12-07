@@ -12,10 +12,12 @@
 #include <vector>
 #include <pthread.h>
 #include <errno.h>
+#include "opencv2/opencv.hpp"
 
 #define BUFF_SIZE 1024
 
 using namespace std;
+using namespace cv;
 
 void *doInChildThread(void *ptr);
 
@@ -207,6 +209,74 @@ void *doInChildThread(void *ptr) {
                         recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
                         bzero(Message,sizeof(char)*BUFF_SIZE);
                         strcpy(Message, "File download complete.");
+                        send(remoteSocket,Message,strlen(Message),0);
+                    }
+                    else {
+
+                        bzero(Message,sizeof(char)*BUFF_SIZE);
+                        strcpy(Message, "The file doesn't exist.");
+                        send(remoteSocket,Message,strlen(Message),0);
+                        recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
+                        send(remoteSocket,Message,strlen(Message),0);
+                    }
+                }
+
+                else {
+                    bzero(Message,sizeof(char)*BUFF_SIZE);
+                    strcpy(Message, "Command format error.");
+                    send(remoteSocket,Message,strlen(Message),0);
+                }
+            }
+
+            else if(strcmp(input_vec[0].c_str(), "play") == 0) {
+                if(input_vec.size() == 2) {
+                    int flag = 0;
+                    struct dirent *pDirent;
+                    DIR *pDir;
+                    pDir = opendir("./server_dir");
+                    while ((pDirent = readdir(pDir)) != NULL) {
+                        if(strcmp(pDirent->d_name, input_vec[1].c_str()) == 0) {
+                            flag = 1;
+                            break;
+                        }
+                    }
+                    closedir(pDir);
+
+                    if(flag == 1) {
+                        bzero(Message,sizeof(char)*BUFF_SIZE);
+                        strcpy(Message, "file exists");
+                        send(remoteSocket,Message,strlen(Message),0);
+
+                        bzero(dir_name,sizeof(char)*BUFF_SIZE);
+                        strcpy(dir_name, "./server_dir/");
+                        strcat(dir_name, input_vec[1].c_str());
+
+                        VideoCapture cap(dir_name);
+
+                        Mat imgServer;
+                        imgServer = Mat::zeros(540 , 960, CV_8UC1);   
+                        
+                        if (!imgServer.isContinuous()) {
+                            imgServer = imgServer.clone();
+                        }
+
+                        int imgSize = imgServer.total() * imgServer.elemSize();
+                        int nbytes;
+
+                        while(1) {      
+                            /* get a frame from camera */
+                            cap >> imgServer;
+                                
+                            //send processed image
+                            if ((nbytes = send(remoteSocket, imgServer.data, imgSize, 0)) < 0){
+                                std::cerr << "bytes = " << bytes << std::endl;
+                                break;
+                            } 
+                        }
+                                  
+                        recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
+                        bzero(Message,sizeof(char)*BUFF_SIZE);
+                        strcpy(Message, "Video play complete.");
                         send(remoteSocket,Message,strlen(Message),0);
                     }
                     else {
