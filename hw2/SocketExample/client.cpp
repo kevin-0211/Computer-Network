@@ -189,7 +189,7 @@ int main(int argc , char *argv[])
                         while(1) {
 
                             if ((nbytes = recv(localSocket, iptr, imgSize , MSG_WAITALL)) == -1) {
-                                std::cerr << "recv failed, received bytes = " << bytes << std::endl;
+                                std::cerr << "recv failed, received bytes = " << nbytes << std::endl;
                             }
                             
                             imshow("Video", imgClient); 

@@ -269,7 +269,7 @@ void *doInChildThread(void *ptr) {
                                 
                             //send processed image
                             if ((nbytes = send(remoteSocket, imgServer.data, imgSize, 0)) < 0){
-                                std::cerr << "bytes = " << bytes << std::endl;
+                                std::cerr << "bytes = " << nbytes << std::endl;
                                 break;
                             } 
                         }
