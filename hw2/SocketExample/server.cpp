@@ -246,6 +246,8 @@ void *doInChildThread(void *ptr) {
                         bzero(Message,sizeof(char)*BUFF_SIZE);
                         strcpy(Message, "file exists");
                         send(remoteSocket,Message,strlen(Message),0);
+                        recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
+
 
                         bzero(dir_name,sizeof(char)*BUFF_SIZE);
                         strcpy(dir_name, "./server_dir/");

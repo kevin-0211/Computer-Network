@@ -177,6 +177,10 @@ int main(int argc , char *argv[])
             if((strcmp(input_vec[0].c_str(), "play") == 0) && input_vec.size() == 2) {
                 if ((recved = recv(localSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0)) > 0) {
                     if(strcmp(receiveMessage, "file exists") == 0) {
+                        bzero(Message,sizeof(char)*BUFF_SIZE);
+                        strcpy(Message, "ok");
+                        send(localSocket,Message,strlen(Message),0);
+
                         Mat imgClient;
                         imgClient = Mat::zeros(540, 960, CV_8UC3);
 
