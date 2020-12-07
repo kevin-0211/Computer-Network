@@ -105,6 +105,8 @@ void *doInChildThread(void *ptr) {
                 input_vec.push_back(string(tmp_str));
                 tmp_str = strtok(NULL, " ");
             }
+            for(int i = 0; i < input_vec.size(); i++)
+                printf("%s\n", input_vec[i].c_str());
 
             if(strcmp(receiveMessage, "exit") == 0)
                 break;
