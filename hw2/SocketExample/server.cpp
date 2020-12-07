@@ -272,8 +272,8 @@ void *doInChildThread(void *ptr) {
 
                             char c = (char)waitKey(33.3333);
                             if(c==27)
-                                    break;
-                            }
+                                break;
+                            
                                 
                             if ((nbytes = send(remoteSocket, imgServer.data, imgSize, 0)) < 0){
                                 std::cerr << "bytes = " << nbytes << std::endl;
