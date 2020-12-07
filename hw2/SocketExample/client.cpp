@@ -92,8 +92,6 @@ int main(int argc , char *argv[])
                 tmp_str = strtok(NULL, " ");
             }
 
-            for(int i = 0; i < input_vec.size(); i++)
-                printf("%s\n", input_vec[i].c_str());
 
             if(strcmp(input, "exit") == 0)
                 break;
@@ -104,6 +102,7 @@ int main(int argc , char *argv[])
                 DIR *pDir;
                 pDir = opendir("./client_dir");
                 while ((pDirent = readdir(pDir)) != NULL) {
+                    printf("%s\n", pDirent->d_name);
                     if(strcmp(pDirent->d_name, input_vec[1].c_str()) == 0) {
                         flag = 1;
                         break;
