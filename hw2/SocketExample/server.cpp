@@ -241,7 +241,7 @@ void *doInChildThread(void *ptr) {
                         }
                     }
                     closedir(pDir);
-
+                    printf("flag = %d\n", flag);
                     if(flag == 1) {
                         bzero(Message,sizeof(char)*BUFF_SIZE);
                         strcpy(Message, "file exists");
