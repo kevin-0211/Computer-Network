@@ -192,6 +192,8 @@ int main(int argc , char *argv[])
                             imgClient = imgClient.clone();
                         }
 
+                        namedWindow("CV Video Client",1);
+                        
                         while(1) {
 
                             if ((nbytes = recv(localSocket, iptr, imgSize , MSG_WAITALL)) == -1) {
