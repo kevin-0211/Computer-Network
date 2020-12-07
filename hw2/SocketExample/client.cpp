@@ -17,6 +17,8 @@
 #define BUFF_SIZE 1024
 
 using namespace std;
+using namespace cv;
+
 int main(int argc , char *argv[])
 {   
     vector<string> arg;
