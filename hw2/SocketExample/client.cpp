@@ -102,7 +102,6 @@ int main(int argc , char *argv[])
                 DIR *pDir;
                 pDir = opendir("./client_dir");
                 while ((pDirent = readdir(pDir)) != NULL) {
-                    printf("%s\n", pDirent->d_name);
                     if(strcmp(pDirent->d_name, input_vec[1].c_str()) == 0) {
                         flag = 1;
                         break;
@@ -113,6 +112,7 @@ int main(int argc , char *argv[])
                 if(flag == 1) {
                     bzero(Message, sizeof(char)*BUFF_SIZE);
                     strcpy(Message, "file exists");
+                    printf("%s\n", Message);
                     send(localSocket, Message, strlen(Message), 0);
 
                     bzero(dir_name,sizeof(char)*BUFF_SIZE);
