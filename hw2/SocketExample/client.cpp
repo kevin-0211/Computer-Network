@@ -175,10 +175,10 @@ int main(int argc , char *argv[])
             }
 
             if((strcmp(input_vec[0].c_str(), "play") == 0) && input_vec.size() == 2) {
+                bzero(receiveMessage,sizeof(char)*BUFF_SIZE);
                 if ((recved = recv(localSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0)) > 0) {
                     if(strcmp(receiveMessage, "file exists") == 0) {
-                        printf("TTTTTRue\n");
-                        
+
                         bzero(Message,sizeof(char)*BUFF_SIZE);
                         strcpy(Message, "ok");
                         send(localSocket,Message,strlen(Message),0);
