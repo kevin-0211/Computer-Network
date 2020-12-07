@@ -10,17 +10,23 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <vector>
+#include <pthread.h>
 
 #define BUFF_SIZE 1024
 
 using namespace std;
+
+void *doInChildThread(void *ptr);
+
 int main(int argc, char** argv){
 
-    int localSocket, remoteSocket, port = 4097;                               
+    int localSocket, remoteSocket, port = atoi(argv[1]), cnt = 0;                               
 
     struct  sockaddr_in localAddr,remoteAddr;
           
-    int addrLen = sizeof(struct sockaddr_in);  
+    int addrLen = sizeof(struct sockaddr_in);
+
+    pthread_t pid[10];  
 
     localSocket = socket(AF_INET , SOCK_STREAM , 0);
     
@@ -63,6 +69,8 @@ int main(int argc, char** argv){
         }
                 
         std::cout << "Connection accepted" << std::endl;
+
+        // pthread_create(&pid[i], NULL, doInChildThread, &remoteSocket);
 
         int sent, recved;
         strcpy(Message,"Hello World!!\n");
@@ -216,3 +224,9 @@ int main(int argc, char** argv){
     }
     return 0;
 }
+
+void *doInChildThread(void *ptr) {
+    int remoteSocket = *(int *)ptr;
+}
+
+

@@ -10,13 +10,14 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <vector>
+#include <pthread.h>
 
 #define BUFF_SIZE 1024
 
 using namespace std;
 int main(int argc , char *argv[])
-{
-
+{   
+    int serverPort = atoi(argv[1]);
     int localSocket, recved;
     localSocket = socket(AF_INET , SOCK_STREAM , 0);
 
@@ -30,7 +31,7 @@ int main(int argc , char *argv[])
 
     info.sin_family = PF_INET;
     info.sin_addr.s_addr = inet_addr("127.0.0.1");
-    info.sin_port = htons(4097);
+    info.sin_port = htons(serverPort);
 
 
     int err = connect(localSocket,(struct sockaddr *)&info,sizeof(info));
@@ -38,6 +39,7 @@ int main(int argc , char *argv[])
         printf("Connection error\n");
         return 0;
     }
+
     char receiveMessage[BUFF_SIZE] = {};
     char input[BUFF_SIZE] = {};
     char Message[BUFF_SIZE] = {};
