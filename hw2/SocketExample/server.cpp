@@ -106,7 +106,11 @@ void *doInChildThread(void *ptr) {
                 tmp_str = strtok(NULL, " ");
             }
 
-            cout << input_vec.size() << endl;
+            if(input_vec.size() == 2)
+                printf("true\n");
+            else
+                printf("false\n");
+            
             if(strcmp(receiveMessage, "exit") == 0)
                 break;
 
