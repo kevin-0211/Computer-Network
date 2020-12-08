@@ -153,7 +153,7 @@ int main(int argc , char *argv[])
                 bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
                 if((recved = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
                     if(strcmp(recv_msg.buf, "file exists") == 0) {
-                        bzero(filename,sizeof(char)*BUFF_SIZE);
+                        bzero(filename, sizeof(char)*BUFF_SIZE);
                         strcpy(filename, "./client_dir/");
                         strcat(filename, input_vec[1].c_str());
 

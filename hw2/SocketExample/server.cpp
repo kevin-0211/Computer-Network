@@ -211,8 +211,8 @@ void *doInChildThread(void *ptr) {
                         
                         send_msg.flag = 1;
                         bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
-                        strcpy(send_msg.buf, "File download complete.");
                         send(remoteSocket, &send_msg, sizeof(Msg), 0);
+                        strcpy(send_msg.buf, "File download complete.");
                         send(remoteSocket, &send_msg, sizeof(Msg), 0);
                     }
                     else {
