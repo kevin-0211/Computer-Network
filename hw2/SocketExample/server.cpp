@@ -283,7 +283,9 @@ void *doInChildThread(void *ptr) {
                         }
                         cap.release();
 
+                        bzero(receiveMessage,sizeof(char)*BUFF_SIZE);
                         recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
+                        printf("%s\n", receiveMessage);
                         bzero(Message,sizeof(char)*BUFF_SIZE);
                         strcpy(Message, "Video play complete.");
                         send(remoteSocket,Message,strlen(Message),0);
