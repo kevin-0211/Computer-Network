@@ -12,12 +12,18 @@
 #include <vector>
 #include <pthread.h>
 #include <errno.h>
-#include "opencv2/opencv.hpp"
+// #include "opencv2/opencv.hpp"
 
 #define BUFF_SIZE 1024
 
 using namespace std;
-using namespace cv;
+// using namespace cv;
+
+typedef struct {
+    int flag;
+    int nbytes;
+    char buf[BUFF_SIZE];
+} Msg;
 
 void *doInChildThread(void *ptr);
 
@@ -85,33 +91,37 @@ int main(int argc, char** argv){
 void *doInChildThread(void *ptr) {
     int remoteSocket = *(int *)ptr;
     int sent, recved;
+
+    Msg recv_msg = {.flag = 0, .nbytes = 0, .buf = {}};
+    Msg send_msg = {.flag = 0, .nbytes = 0, .buf = {}};
     char Message[BUFF_SIZE] = {};
     char receiveMessage[BUFF_SIZE] = {};
     char dir_buf[BUFF_SIZE] = {};
     char tmp_buf[BUFF_SIZE] = {};
     char file_buf[BUFF_SIZE] = {};
-    char dir_name[BUFF_SIZE] = {};
+    char filename[BUFF_SIZE] = {};
 
-    strcpy(Message,"Hello World!!\n");
-    sent = send(remoteSocket,Message,strlen(Message),0);
+    bzero(send_msg.buf,sizeof(char)*BUFF_SIZE);
+    strcpy(send_msg.buf,"Connection Successful!!\n");
+    sent = send(remoteSocket,&send_msg,sizeof(Message),0);
 
     while(1) {
-        bzero(receiveMessage,sizeof(char)*BUFF_SIZE);
-        if((recved = recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0)) > 0) {
+        bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
+        if((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
                 
             vector<string> input_vec;
-            char * message = new char[strlen(receiveMessage)+1];
-            strcpy(message, receiveMessage);
+            char* message = new char[strlen(receiveMessage)+1];
+            strcpy(message, recv_msg.buf);
             char* tmp_str = strtok(message, " ");
             while(tmp_str != NULL) {
                 input_vec.push_back(string(tmp_str));
                 tmp_str = strtok(NULL, " ");
             }
             
-            if(strcmp(receiveMessage, "exit") == 0)
+            if(strcmp(recv_msg.buf, "exit") == 0)
                 break;
 
-            else if(strcmp(receiveMessage, "ls") == 0) {
+            else if(strcmp(recv_msg.buf, "ls") == 0) {
                 bzero(dir_buf,sizeof(char)*BUFF_SIZE);
                 struct dirent *pDirent;
                 DIR *pDir;
@@ -128,43 +138,39 @@ void *doInChildThread(void *ptr) {
 
                 if(strlen(dir_buf) == 0)
                     strcpy(dir_buf, " ");
-                bzero(Message,sizeof(char)*BUFF_SIZE);
-                strcpy(Message, dir_buf);
-                send(remoteSocket,Message,strlen(Message),0);
+                bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                strcpy(send_msg.buf, dir_buf);
+                send(remoteSocket, &send_msg, sizeof(Msg), 0);
             }
 
-            else if((strcmp(input_vec[0].c_str(), "put") == 0) && (input_vec.size() == 2)) {
-                
-                bzero(receiveMessage,sizeof(char)*BUFF_SIZE);
-                if((recved = recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0)) > 0) {
-                    if(strcmp(receiveMessage, "file exists") == 0) {
-                        bzero(Message,sizeof(char)*BUFF_SIZE);
-                        strcpy(Message, "ok");
-                        send(remoteSocket,Message,strlen(Message),0);
+            else if((strcmp(input_vec[0].c_str(), "put") == 0) && (input_vec.size() == 2)) {  
+                bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
+                if((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
+                    if(strcmp(recv_msg.buf, "file exists") == 0) {
+                        bzero(filename,sizeof(char)*BUFF_SIZE);
+                        strcpy(filename, "./server_dir/");
+                        strcat(filename, input_vec[1].c_str());
 
-                        bzero(dir_name,sizeof(char)*BUFF_SIZE);
-                        strcpy(dir_name, "./server_dir/");
-                        strcat(dir_name, input_vec[1].c_str());
-
-                        FILE *fp = fopen(dir_name, "wb");
-                        bzero(file_buf,sizeof(char)*BUFF_SIZE);
+                        FILE *fp = fopen(filename, "wb");
+                        recv_msg.flag = 0;
+                        bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
                         int nbytes;
-                        while((nbytes = recv(remoteSocket, file_buf, BUFF_SIZE, 0)) > 0) {
-                            fwrite(file_buf, sizeof(char), nbytes, fp);
-                            bzero(file_buf,sizeof(char)*BUFF_SIZE);
-                            if (nbytes == 0 || nbytes != BUFF_SIZE)
+                        while((nbytes = recv(remoteSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
+                            if (recv_msg.flag == 1)
                                 break;
+                            fwrite(recv_msg.buf, sizeof(char), recv_msg.nbytes, fp);
+                            bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
                         }
                         fclose(fp);
 
-                        bzero(Message,sizeof(char)*BUFF_SIZE);
-                        strcpy(Message, "File upload complete.");
-                        send(remoteSocket,Message,strlen(Message),0);
+                        bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                        strcpy(send_msg.buf, "File uploading complete.");
+                        send(remoteSocket, &send_msg, sizeof(Msg), 0);
                     }
                     else {
-                        bzero(Message,sizeof(char)*BUFF_SIZE);
-                        strcpy(Message, "The file doesn't exist.");
-                        send(remoteSocket,Message,strlen(Message),0);
+                        bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                        strcpy(send_msg.buf, "The file doesn't exist.");
+                        send(remoteSocket, &send_msg, sizeof(Msg), 0);
                     }
                 }
             }
@@ -184,40 +190,36 @@ void *doInChildThread(void *ptr) {
                     closedir(pDir);
 
                     if(flag == 1) {
-                        bzero(Message,sizeof(char)*BUFF_SIZE);
-                        strcpy(Message, "file exists");
-                        send(remoteSocket,Message,strlen(Message),0);
+                        bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                        strcpy(send_msg.buf, "file exists");
+                        send(remoteSocket, &send_msg, sizeof(Msg), 0);
 
-                        bzero(dir_name,sizeof(char)*BUFF_SIZE);
-                        strcpy(dir_name, "./server_dir/");
-                        strcat(dir_name, input_vec[1].c_str());
+                        bzero(filename, sizeof(char)*BUFF_SIZE);
+                        strcpy(filename, "./server_dir/");
+                        strcat(filename, input_vec[1].c_str());
 
-                        FILE *fp = fopen(dir_name, "rb");
-                        bzero(file_buf,sizeof(char)*BUFF_SIZE);
+                        FILE *fp = fopen(filename, "rb");
+                        send_msg.flag = 0;
+                        bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
                         int nbytes;
-                        while((nbytes = fread(file_buf, sizeof(char), BUFF_SIZE, fp)) > 0) {
-                            if(send(remoteSocket, file_buf, nbytes, 0) < 0) {
-                                fprintf(stderr, "ERROR: Failed to send file %s. (errno = %d)\n", input_vec[1].c_str(), errno);
-                                break;
-                            }
-                            bzero(file_buf, sizeof(char)*BUFF_SIZE);
-                            if (nbytes == 0 || nbytes != BUFF_SIZE)
-                                break;
+                        while((nbytes = fread(send_msg.buf, sizeof(char), BUFF_SIZE, fp)) > 0) {
+                            send_msg.nbytes = nbytes;
+                            send(remoteSocket, &send_msg, sizeof(Msg), 0);
+                            bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
                         }
                         fclose(fp);
-                            
-                        recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
-                        bzero(Message,sizeof(char)*BUFF_SIZE);
-                        strcpy(Message, "File download complete.");
-                        send(remoteSocket,Message,strlen(Message),0);
+                        
+                        send_msg.flag = 1;
+                        bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                        strcpy(send_msg.buf, "File download complete.");
+                        send(remoteSocket, &send_msg, sizeof(Msg), 0);
+                        send(remoteSocket, &send_msg, sizeof(Msg), 0);
                     }
                     else {
-
-                        bzero(Message,sizeof(char)*BUFF_SIZE);
-                        strcpy(Message, "The file doesn't exist.");
-                        send(remoteSocket,Message,strlen(Message),0);
-                        recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
-                        send(remoteSocket,Message,strlen(Message),0);
+                        bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                        strcpy(send_msg.buf, "The file doesn't exist.");
+                        send(remoteSocket, &send_msg, sizeof(Msg), 0);
+                        send(remoteSocket, &send_msg, sizeof(Msg), 0);
                     }
                 }
 
@@ -228,6 +230,7 @@ void *doInChildThread(void *ptr) {
                 }
             }
 
+            /**
             else if(strcmp(input_vec[0].c_str(), "play") == 0) {
                 if(input_vec.size() == 2) {
                     int flag = 0;
@@ -243,17 +246,17 @@ void *doInChildThread(void *ptr) {
                     closedir(pDir);
 
                     if(flag == 1) {
-                        bzero(Message,sizeof(char)*BUFF_SIZE);
+                        bzero(,sizeof(char)*BUFF_SIZE);
                         strcpy(Message, "file exists");
                         send(remoteSocket,Message,strlen(Message),0);
                         recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
 
 
-                        bzero(dir_name,sizeof(char)*BUFF_SIZE);
-                        strcpy(dir_name, "./server_dir/");
-                        strcat(dir_name, input_vec[1].c_str());
+                        bzero(filename,sizeof(char)*BUFF_SIZE);
+                        strcpy(filename, "./server_dir/");
+                        strcat(filename, input_vec[1].c_str());
 
-                        VideoCapture cap(dir_name);
+                        VideoCapture cap(filename);
 
                         Mat imgServer;
                         imgServer = Mat::zeros(540 , 960, CV_8UC3);   
@@ -304,11 +307,12 @@ void *doInChildThread(void *ptr) {
                     send(remoteSocket,Message,strlen(Message),0);
                 }
             }
+            **/
 
             else{
-                bzero(Message,sizeof(char)*BUFF_SIZE);
-                strcpy(Message, "Command not found.");
-                send(remoteSocket,Message,strlen(Message),0);
+                bzero(send_msg.buf,sizeof(char)*BUFF_SIZE);
+                strcpy(send_msg.buf, "Command not found.");
+                send(remoteSocket, &send_msg, sizeof(Msg), 0);
             }
         }
     }        

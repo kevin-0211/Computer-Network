@@ -12,12 +12,18 @@
 #include <vector>
 #include <pthread.h>
 #include <errno.h>
-#include "opencv2/opencv.hpp"
+// #include "opencv2/opencv.hpp"
 
 #define BUFF_SIZE 1024
 
 using namespace std;
-using namespace cv;
+// using namespace cv;
+
+typedef struct {
+    int flag;
+    int nbytes;
+    char buf[BUFF_SIZE];
+} Msg;
 
 int main(int argc , char *argv[])
 {   
@@ -57,44 +63,45 @@ int main(int argc , char *argv[])
         return 0;
     }
 
+    Msg recv_msg = {.flag = 0, .nbytes = 0, .buf = {}};
+    Msg send_msg = {.flag = 0, .nbytes = 0, .buf = {}};
 
     char receiveMessage[BUFF_SIZE] = {};
     char input[BUFF_SIZE] = {};
     char Message[BUFF_SIZE] = {};
     char file_buf[BUFF_SIZE] = {};
-    char dir_name[BUFF_SIZE] = {};
+    char filename[BUFF_SIZE] = {};
     int sent;
     
     while(1){
-        bzero(receiveMessage,sizeof(char)*BUFF_SIZE);
-        if ((recved = recv(localSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0)) < 0){
+        bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
+        if((recved = recv(localSocket, &recv_msg, sizeof(Msg), 0)) < 0){
             cout << "recv failed, with received bytes = " << recved << endl;
             break;
         }
-        else if (recved == 0){
+        else if(recved == 0){
             cout << "<end>\n";
             break;
         }
-        printf("%d:%s\n",recved,receiveMessage);
+        printf("%s\n", recv_msg.buf);
         
         while(1){
             bzero(input,sizeof(char)*BUFF_SIZE);
-            bzero(Message,sizeof(char)*BUFF_SIZE);
+            bzero(send_msg.buf,sizeof(char)*BUFF_SIZE);
             cin.getline(input, BUFF_SIZE);
             if (strlen(input) == 0)
                 continue;
-            strcpy(Message, input);
-            send(localSocket, Message, strlen(Message), 0);
+            strcpy(send_msg.buf, input);
+            send(localSocket, &send_msg, sizeof(Msg), 0);
 
             vector<string> input_vec;
-            char* message = new char[strlen(input)+1];
-            strcpy(message, input);
-            char* tmp_str = strtok(message, " ");
+            char* tmp_input = new char[strlen(input)+1];
+            strcpy(tmp_input, input);
+            char* tmp_str = strtok(tmp_input, " ");
             while(tmp_str != NULL) {
                 input_vec.push_back(string(tmp_str));
                 tmp_str = strtok(NULL, " ");
             }
-
 
             if(strcmp(input, "exit") == 0)
                 break;
@@ -104,7 +111,7 @@ int main(int argc , char *argv[])
                 struct dirent *pDirent;
                 DIR *pDir;
                 pDir = opendir("./client_dir");
-                while ((pDirent = readdir(pDir)) != NULL) {
+                while((pDirent = readdir(pDir)) != NULL) {
                     if(strcmp(pDirent->d_name, input_vec[1].c_str()) == 0) {
                         flag = 1;
                         break;
@@ -113,71 +120,63 @@ int main(int argc , char *argv[])
                 closedir (pDir);
 
                 if(flag == 1) {
-                    bzero(Message, sizeof(char)*BUFF_SIZE);
-                    strcpy(Message, "file exists");
-                    send(localSocket, Message, strlen(Message), 0);
-                    recv(localSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
+                    bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                    strcpy(send_msg.buf, "file exists");
+                    send(localSocket, &send_msg, sizeof(Msg), 0);
 
-                    bzero(dir_name,sizeof(char)*BUFF_SIZE);
-                    strcpy(dir_name, "./client_dir/");
-                    strcat(dir_name, input_vec[1].c_str());
-                    FILE *fp = fopen(dir_name, "rb");
-
-
-                    bzero(file_buf, sizeof(char)*BUFF_SIZE);
+                    bzero(filename,sizeof(char)*BUFF_SIZE);
+                    strcpy(filename, "./client_dir/");
+                    strcat(filename, input_vec[1].c_str());
+                    FILE *fp = fopen(filename, "rb");
                     int nbytes;
-                    while((nbytes = fread(file_buf, sizeof(char), BUFF_SIZE, fp)) > 0) {
-                        if(send(localSocket, file_buf, nbytes, 0) < 0) {
-                            fprintf(stderr, "ERROR: Failed to send file %s. (errno = %d)\n", input_vec[1].c_str(), errno);
-                            break;
-                        }
-                        bzero(file_buf, sizeof(char)*BUFF_SIZE);
-                        if (nbytes == 0 || nbytes != BUFF_SIZE)
-                            break;
+
+                    send_msg.flag = 0;
+                    bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                    while((nbytes = fread(send_msg.buf, sizeof(char), BUFF_SIZE, fp)) > 0) {
+                        send_msg.nbytes = nbytes;
+                        send(localSocket, &send_msg, sizeof(Msg), 0);
+                        bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
                     }
                     fclose(fp);
+                    send_msg.flag = 1;
+                    bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                    send(localSocket, &send_msg, sizeof(Msg), 0);
                 }
                 else {
-                    bzero(Message, sizeof(char)*BUFF_SIZE);
-                    strcpy(Message, "file doesn't exist");
-                    send(localSocket, Message, strlen(Message), 0);
+                    bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                    strcpy(send_msg.buf, "file doesn't exist");
+                    send(localSocket, &send_msg, sizeof(Msg), 0);
                 }
             }
 
             if((strcmp(input_vec[0].c_str(), "get") == 0) && input_vec.size() == 2) {
-                bzero(receiveMessage,sizeof(char)*BUFF_SIZE);
-                if ((recved = recv(localSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0)) > 0) {
-                    if(strcmp(receiveMessage, "file exists") == 0) {
-                        bzero(dir_name,sizeof(char)*BUFF_SIZE);
-                        strcpy(dir_name, "./client_dir/");
-                        strcat(dir_name, input_vec[1].c_str());
+                bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
+                if((recved = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
+                    if(strcmp(recv_msg.buf, "file exists") == 0) {
+                        bzero(filename,sizeof(char)*BUFF_SIZE);
+                        strcpy(filename, "./client_dir/");
+                        strcat(filename, input_vec[1].c_str());
 
-                        FILE *fp = fopen(dir_name, "wb");
-                        bzero(file_buf,sizeof(char)*BUFF_SIZE);
+                        FILE *fp = fopen(filename, "wb");
+                        recv_msg.flag = 0;
+                        bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
                         int nbytes;
-                        while((nbytes = recv(localSocket, file_buf, BUFF_SIZE, 0)) > 0) {
-                            fwrite(file_buf, sizeof(char), nbytes, fp);
-                            bzero(file_buf,sizeof(char)*BUFF_SIZE);
-                            if (nbytes == 0 || nbytes != BUFF_SIZE)
+                        while((nbytes = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
+                            if(recv_msg.flag == 1)
                                 break;
+                            fwrite(recv_msg.buf, sizeof(char), recv_msg.nbytes, fp);
+                            bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
                         }
                         fclose(fp);
-                        bzero(Message, sizeof(char)*BUFF_SIZE);
-                        strcpy(Message, "download complete");
-                        send(localSocket, Message, strlen(Message), 0);
-                    }
-                    else {
-                        bzero(Message, sizeof(char)*BUFF_SIZE);
-                        strcpy(Message, "file doesn't exist");
-                        send(localSocket, Message, strlen(Message), 0);
                     }
                 }
             }
 
+            /**
             if((strcmp(input_vec[0].c_str(), "play") == 0) && input_vec.size() == 2) {
-                bzero(receiveMessage,sizeof(char)*BUFF_SIZE);
-                if ((recved = recv(localSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0)) > 0) {
-                    if(strcmp(receiveMessage, "file exists") == 0) {
+                bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
+                if((recved = recv(localSocket, &recv_msg, sizeof(recv_msg), 0)) > 0) {
+                    if(strcmp(recv_msg.buf, "file exists") == 0) {
 
                         bzero(Message,sizeof(char)*BUFF_SIZE);
                         strcpy(Message, "ok");
@@ -231,10 +230,10 @@ int main(int argc , char *argv[])
                     }
                 }
             }
-
-            bzero(receiveMessage,sizeof(char)*BUFF_SIZE);
-            if ((recved = recv(localSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0)) > 0)  
-                printf("%s\n", receiveMessage);
+            **/
+            bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
+            if ((recved = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0)  
+                printf("%s\n", recv_msg.buf);
         }
     }
 
