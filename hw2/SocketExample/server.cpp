@@ -94,23 +94,20 @@ void *doInChildThread(void *ptr) {
 
     Msg recv_msg = {.flag = 0, .nbytes = 0, .buf = {}};
     Msg send_msg = {.flag = 0, .nbytes = 0, .buf = {}};
-    char Message[BUFF_SIZE] = {};
-    char receiveMessage[BUFF_SIZE] = {};
     char dir_buf[BUFF_SIZE] = {};
     char tmp_buf[BUFF_SIZE] = {};
-    char file_buf[BUFF_SIZE] = {};
     char filename[BUFF_SIZE] = {};
 
-    bzero(send_msg.buf,sizeof(char)*BUFF_SIZE);
+    bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
     strcpy(send_msg.buf,"Connection Successful!!\n");
-    sent = send(remoteSocket,&send_msg,sizeof(Message),0);
+    sent = send(remoteSocket, &send_msg, sizeof(Msg), 0);
 
     while(1) {
         bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
         if((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
                 
             vector<string> input_vec;
-            char* message = new char[strlen(receiveMessage)+1];
+            char* message = new char[strlen(recv_msg.buf)+1];
             strcpy(message, recv_msg.buf);
             char* tmp_str = strtok(message, " ");
             while(tmp_str != NULL) {
@@ -224,9 +221,9 @@ void *doInChildThread(void *ptr) {
                 }
 
                 else {
-                    bzero(Message,sizeof(char)*BUFF_SIZE);
-                    strcpy(Message, "Command format error.");
-                    send(remoteSocket,Message,strlen(Message),0);
+                    bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                    strcpy(send_msg.buf, "Command format error.");
+                    send(remoteSocket, &send_msg, sizeof(Msg), 0);
                 }
             }
 

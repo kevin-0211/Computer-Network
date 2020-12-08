@@ -65,11 +65,7 @@ int main(int argc , char *argv[])
 
     Msg recv_msg = {.flag = 0, .nbytes = 0, .buf = {}};
     Msg send_msg = {.flag = 0, .nbytes = 0, .buf = {}};
-
-    char receiveMessage[BUFF_SIZE] = {};
     char input[BUFF_SIZE] = {};
-    char Message[BUFF_SIZE] = {};
-    char file_buf[BUFF_SIZE] = {};
     char filename[BUFF_SIZE] = {};
     int sent;
     
