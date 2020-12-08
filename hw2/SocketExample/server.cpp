@@ -201,14 +201,15 @@ void *doInChildThread(void *ptr) {
                         FILE *fp = fopen(filename, "rb");
                         send_msg.flag = 0;
                         bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
-                        int nbytes;
+                        int nbytes, sum;
                         while((nbytes = fread(send_msg.buf, sizeof(char), BUFF_SIZE, fp)) > 0) {
                             send_msg.nbytes = nbytes;
+                            sum += nbytes;
                             send(remoteSocket, &send_msg, sizeof(Msg), 0);
                             bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
                         }
                         fclose(fp);
-                        
+                        printf("sum = %d\n", sum);
                         send_msg.flag = 1;
                         bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
                         send(remoteSocket, &send_msg, sizeof(Msg), 0);

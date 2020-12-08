@@ -160,13 +160,15 @@ int main(int argc , char *argv[])
                         FILE *fp = fopen(filename, "wb");
                         recv_msg.flag = 0;
                         bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
-                        int nbytes;
+                        int nbytes, sum;
                         while((nbytes = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
                             if(recv_msg.flag == 1)
                                 break;
+                            sum += nbytes;
                             fwrite(recv_msg.buf, sizeof(char), recv_msg.nbytes, fp);
                             bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
                         }
+                        printf("sum = %d\n", sum);
                         fclose(fp);
                     }
                 }
