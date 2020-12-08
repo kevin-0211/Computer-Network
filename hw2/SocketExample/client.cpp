@@ -187,6 +187,8 @@ int main(int argc , char *argv[])
                         imgClient = Mat::zeros(540, 960, CV_8UC3);
 
                         int nbytes;
+                        int imgSize = imgClient.total() * imgClient.elemSize();
+                        uchar *iptr = imgClient.data;
 
                         if(!imgClient.isContinuous()){
                             imgClient = imgClient.clone();
@@ -194,8 +196,6 @@ int main(int argc , char *argv[])
 
 
                         while(1) {
-                            int imgSize = imgClient.total() * imgClient.elemSize();
-                            uchar *iptr = imgClient.data;
 
                             if ((nbytes = recv(localSocket, iptr, imgSize , MSG_WAITALL)) == -1) {
                                 std::cerr << "recv failed, received bytes = " << nbytes << std::endl;
@@ -218,7 +218,7 @@ int main(int argc , char *argv[])
                             if(nbytes != imgSize)
                                 break;
                         }
-                        
+
                         bzero(Message, sizeof(char)*BUFF_SIZE);
                         strcpy(Message, "play complete");
                         send(localSocket, Message, strlen(Message), 0);
