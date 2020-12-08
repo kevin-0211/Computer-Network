@@ -218,7 +218,7 @@ int main(int argc , char *argv[])
                             if(nbytes == 0)
                                 break;
                         }
-
+                        printf("finish\n");
                         bzero(Message, sizeof(char)*BUFF_SIZE);
                         strcpy(Message, "play complete");
                         send(localSocket, Message, strlen(Message), 0);
