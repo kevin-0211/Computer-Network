@@ -275,8 +275,10 @@ void *doInChildThread(void *ptr) {
                                 break;
                             } 
 
-                            if((recved = recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,MSG_DONTWAIT)) > 0)
+                            if((recved = recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,MSG_DONTWAIT)) > 0) {
+                                printf("%s\n", receiveMessage);
                                 break;
+                            }
 
                         }
                         cap.release();
