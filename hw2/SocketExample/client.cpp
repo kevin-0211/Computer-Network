@@ -214,8 +214,8 @@ int main(int argc , char *argv[])
                         destroyAllWindows();
 
                         while(1) {
-                            nbytes = recv(localSocket, iptr, imgSize , 0);
-                            if(nbytes != imgSize)
+                            nbytes = recv(localSocket, iptr, imgSize, MSG_DONTWAIT);
+                            if(nbytes == 0)
                                 break;
                         }
 

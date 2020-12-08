@@ -283,11 +283,12 @@ void *doInChildThread(void *ptr) {
                         }
                         cap.release();
 
+                        recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
                         bzero(Message,sizeof(char)*BUFF_SIZE);
                         strcpy(Message, "Video play complete.");
                         send(remoteSocket,Message,strlen(Message),0);
-                        recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
-                        send(remoteSocket,Message,strlen(Message),0);
+                        
+        
                     }
                     else {
 
