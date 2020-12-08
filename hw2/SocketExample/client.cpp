@@ -84,6 +84,8 @@ int main(int argc , char *argv[])
         while(1){
             bzero(input,sizeof(char)*BUFF_SIZE);
             bzero(send_msg.buf,sizeof(char)*BUFF_SIZE);
+            recv_msg.flag = 0;
+            send_msg.flag = 0;
             cin.getline(input, BUFF_SIZE);
             if (strlen(input) == 0)
                 continue;
@@ -126,7 +128,6 @@ int main(int argc , char *argv[])
                     FILE *fp = fopen(filename, "rb");
                     int nbytes;
 
-                    send_msg.flag = 0;
                     bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
                     while((nbytes = fread(send_msg.buf, sizeof(char), BUFF_SIZE, fp)) > 0) {
                         send_msg.nbytes = nbytes;
@@ -154,7 +155,6 @@ int main(int argc , char *argv[])
                         strcat(filename, input_vec[1].c_str());
 
                         FILE *fp = fopen(filename, "wb");
-                        recv_msg.flag = 0;
                         bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
                         int nbytes;
                         while((nbytes = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0) {

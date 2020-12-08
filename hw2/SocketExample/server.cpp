@@ -100,10 +100,12 @@ void *doInChildThread(void *ptr) {
 
     bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
     strcpy(send_msg.buf,"Connection Successful!!\n");
-    sent = send(remoteSocket, &send_msg, sizeof(Msg), 0);
+    send(remoteSocket, &send_msg, sizeof(Msg), 0);
 
     while(1) {
         bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
+        recv_msg.flag = 0;
+        send_msg.flag = 0;
         if((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
                 
             vector<string> input_vec;
@@ -149,7 +151,6 @@ void *doInChildThread(void *ptr) {
                         strcat(filename, input_vec[1].c_str());
 
                         FILE *fp = fopen(filename, "wb");
-                        recv_msg.flag = 0;
                         bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
                         int nbytes;
                         while((nbytes = recv(remoteSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
@@ -196,7 +197,6 @@ void *doInChildThread(void *ptr) {
                         strcat(filename, input_vec[1].c_str());
 
                         FILE *fp = fopen(filename, "rb");
-                        send_msg.flag = 0;
                         bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
                         int nbytes, sum;
                         while((nbytes = fread(send_msg.buf, sizeof(char), BUFF_SIZE, fp)) > 0) {
