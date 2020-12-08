@@ -256,7 +256,7 @@ void *doInChildThread(void *ptr) {
                         VideoCapture cap(dir_name);
 
                         Mat imgServer;
-                        imgServer = Mat::zeros(540 , 960, CV_8UC1);   
+                        imgServer = Mat::zeros(540 , 960, CV_8UC3);   
                         
                         if (!imgServer.isContinuous()) {
                             imgServer = imgServer.clone();
