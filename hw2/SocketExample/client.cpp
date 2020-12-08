@@ -196,7 +196,7 @@ int main(int argc , char *argv[])
                         while(1) {
                             int imgSize = imgClient.total() * imgClient.elemSize();
                             uchar *iptr = imgClient.data;
-                            
+
                             if ((nbytes = recv(localSocket, iptr, imgSize , MSG_WAITALL)) == -1) {
                                 std::cerr << "recv failed, received bytes = " << nbytes << std::endl;
                             }
@@ -204,15 +204,26 @@ int main(int argc , char *argv[])
                             imshow("Video", imgClient); 
                           
                             char c = (char)waitKey(33.3333);
-                            if(c == 27)
+                            if(c == 27) {
+                                bzero(Message, sizeof(char)*BUFF_SIZE);
+                                strcpy(Message, "stop");
+                                send(localSocket, Message, strlen(Message), 0);
                                 break;
+                            }
                         }   
                         destroyAllWindows();
 
-
+                        while(1) {
+                            nbytes = recv(localSocket, iptr, imgSize , 0);
+                            if(nbytes != imgSize)
+                                break;
+                        }
+                        
                         bzero(Message, sizeof(char)*BUFF_SIZE);
                         strcpy(Message, "play complete");
                         send(localSocket, Message, strlen(Message), 0);
+
+
                     }
                     else {
                         bzero(Message, sizeof(char)*BUFF_SIZE);
