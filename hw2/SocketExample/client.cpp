@@ -164,7 +164,7 @@ int main(int argc , char *argv[])
                         while((nbytes = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
                             if(recv_msg.flag == 1)
                                 break;
-                            sum += nbytes;
+                            sum += recv_msg.nbytes;
                             fwrite(recv_msg.buf, sizeof(char), recv_msg.nbytes, fp);
                             bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
                         }
