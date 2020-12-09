@@ -245,21 +245,23 @@ void *doInChildThread(void *ptr) {
                     closedir(pDir);
 
                     if(flag == 1) {
-                        bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
-                        strcpy(send_msg.buf, "file exists");
-                        send(remoteSocket, &send_msg, sizeof(Msg), 0);
-
-
                         bzero(filename,sizeof(char)*BUFF_SIZE);
                         strcpy(filename, "./server_dir/");
                         strcat(filename, input_vec[1].c_str());
 
                         VideoCapture cap(filename);
-                        int width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
+                        int width  = cap.get(CV_CAP_PROP_FRAME_WIDTH);
                         int height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
 
+                        bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                        send_msg.flag = width;
+                        send_msg.nbytes = height;
+                        strcpy(send_msg.buf, "file exists");
+                        send(remoteSocket, &send_msg, sizeof(Msg), 0);
+
                         Mat imgServer;
-                        imgServer = Mat::zeros(540 , 960, CV_8UC3);   
+                        imgServer = Mat::zeros(height, weight, CV_8UC3);   
+                        int imgSize = imgServer.total() * imgServer.elemSize();
                         
                         if (!imgServer.isContinuous()) {
                             imgServer = imgServer.clone();
@@ -267,8 +269,6 @@ void *doInChildThread(void *ptr) {
 
                         int nbytes;
                         while(1) {      
-                            int imgSize = imgServer.total() * imgServer.elemSize();
-
                             cap >> imgServer;
                             
                             if ((nbytes = send(remoteSocket, imgServer.data, imgSize, 0)) < 0){
@@ -276,18 +276,16 @@ void *doInChildThread(void *ptr) {
                                 break;
                             } 
 
-                            if((recved = recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,MSG_DONTWAIT)) > 0)
+                            if((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0)
                                 break;
-
                         }
                         cap.release();
 
-                        recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
-                        bzero(Message,sizeof(char)*BUFF_SIZE);
-                        strcpy(Message, "Video play complete.");
-                        send(remoteSocket,Message,strlen(Message),0);
+                        recv(remoteSocket, &recv_msg, sizeof(Msg), 0);
+                        bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                        strcpy(send_msg.buf, "Video play complete.");
+                        send(remoteSocket, &send_msg, sizeof(Msg), 0);
                         
-        
                     }
                     else {
                         bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);

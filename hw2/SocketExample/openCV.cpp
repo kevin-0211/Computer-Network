@@ -56,7 +56,7 @@ int main(int argc, char** argv){
         char c = (char)waitKey(33.3333);
         if(c==27)
                 break;
-        }
+     }
       ////////////////////////////////////////////////////
 	cap.release();
 	destroyAllWindows();

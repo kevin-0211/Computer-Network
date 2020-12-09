@@ -173,15 +173,13 @@ int main(int argc , char *argv[])
             /**
             if((strcmp(input_vec[0].c_str(), "play") == 0) && input_vec.size() == 2) {
                 bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
-                if((recved = recv(localSocket, &recv_msg, sizeof(recv_msg), 0)) > 0) {
+                if((recved = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
                     if(strcmp(recv_msg.buf, "file exists") == 0) {
-
-                        bzero(Message,sizeof(char)*BUFF_SIZE);
-                        strcpy(Message, "ok");
-                        send(localSocket,Message,strlen(Message),0);
+                        int width = recv_msg.flag;
+                        int height = recv_msg.nbytes;
 
                         Mat imgClient;
-                        imgClient = Mat::zeros(540, 960, CV_8UC3);
+                        imgClient = Mat::zeros(height, width, CV_8UC3);
 
                         int nbytes;
                         int imgSize = imgClient.total() * imgClient.elemSize();
@@ -193,7 +191,6 @@ int main(int argc , char *argv[])
 
 
                         while(1) {
-
                             if ((nbytes = recv(localSocket, iptr, imgSize , MSG_WAITALL)) == -1) {
                                 std::cerr << "recv failed, received bytes = " << nbytes << std::endl;
                             }
@@ -202,29 +199,21 @@ int main(int argc , char *argv[])
                           
                             char c = (char)waitKey(33.3333);
                             if(c == 27) {
-                                bzero(Message, sizeof(char)*BUFF_SIZE);
-                                strcpy(Message, "stop");
-                                send(localSocket, Message, strlen(Message), 0);
+                                bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                                send(localSocket, &send_msg, sizeof(Msg), 0);
                                 break;
                             }
                         }   
                         destroyAllWindows();
 
                         while(1) {
-                            if((nbytes = recv(localSocket, iptr, imgSize, MSG_DONTWAIT)) == -1)
+                            if((nbytes = recv(localSocket, iptr, imgSize, MSG_DONTWAIT)) <= 0)
                                 break;
                         }
                         
-                        bzero(Message, sizeof(char)*BUFF_SIZE);
-                        strcpy(Message, "play complete");
-                        send(localSocket, Message, strlen(Message), 0);
-
-
-                    }
-                    else {
-                        bzero(Message, sizeof(char)*BUFF_SIZE);
-                        strcpy(Message, "file doesn't exist");
-                        send(localSocket, Message, strlen(Message), 0);
+                        bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                        strcpy(send_msg.buf, "play complete");
+                        send(localSocket, &send_msg, sizeof(Msg), 0);
                     }
                 }
             }
