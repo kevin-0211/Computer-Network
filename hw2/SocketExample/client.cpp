@@ -12,12 +12,12 @@
 #include <vector>
 #include <pthread.h>
 #include <errno.h>
-// #include "opencv2/opencv.hpp"
+#include "opencv2/opencv.hpp"
 
 #define BUFF_SIZE 1024
 
 using namespace std;
-// using namespace cv;
+using namespace cv;
 
 typedef struct {
     int flag;
@@ -104,7 +104,7 @@ int main(int argc , char *argv[])
             if(strcmp(input, "exit") == 0)
                 break;
 
-            if((strcmp(input_vec[0].c_str(), "put") == 0) && input_vec.size() == 2){              
+            else if((strcmp(input_vec[0].c_str(), "put") == 0) && input_vec.size() == 2){              
                 int flag = 0;
                 struct dirent *pDirent;
                 DIR *pDir;
@@ -146,7 +146,7 @@ int main(int argc , char *argv[])
                 }
             }
 
-            if((strcmp(input_vec[0].c_str(), "get") == 0) && input_vec.size() == 2) {
+            else if((strcmp(input_vec[0].c_str(), "get") == 0) && input_vec.size() == 2) {
                 bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
                 if((recved = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
                     if(strcmp(recv_msg.buf, "file exists") == 0) {
@@ -170,8 +170,7 @@ int main(int argc , char *argv[])
                 }
             }
 
-            /**
-            if((strcmp(input_vec[0].c_str(), "play") == 0) && input_vec.size() == 2) {
+            else if((strcmp(input_vec[0].c_str(), "play") == 0) && input_vec.size() == 2) {
                 bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
                 if((recved = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
                     if(strcmp(recv_msg.buf, "file exists") == 0) {
@@ -183,18 +182,20 @@ int main(int argc , char *argv[])
 
                         int nbytes;
                         int imgSize = imgClient.total() * imgClient.elemSize();
-                        uchar *iptr = imgClient.data;
 
                         if(!imgClient.isContinuous()){
                             imgClient = imgClient.clone();
                         }
 
+                        typedef struct {
+                            int flag;
+                            uchar *iptr;
+                        } Frame;
+
+                        Frame recv_frame = {.flag = 0, .iptr = imgClient.data};
 
                         while(1) {
-                            if ((nbytes = recv(localSocket, iptr, imgSize , MSG_WAITALL)) == -1) {
-                                std::cerr << "recv failed, received bytes = " << nbytes << std::endl;
-                            }
-                            
+                            nbytes = recv(localSocket, &recv_frame, sizeof(Frame), 0);
                             imshow("Video", imgClient); 
                           
                             char c = (char)waitKey(33.3333);
@@ -207,17 +208,14 @@ int main(int argc , char *argv[])
                         destroyAllWindows();
 
                         while(1) {
-                            if((nbytes = recv(localSocket, iptr, imgSize, MSG_DONTWAIT)) <= 0)
+                            recv(localSocket, &recv_frame, sizeof(Frame), 0);
+                            if(recv_frame.flag == 1)
                                 break;
                         }
-                        
-                        bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
-                        strcpy(send_msg.buf, "play complete");
-                        send(localSocket, &send_msg, sizeof(Msg), 0);
                     }
                 }
             }
-            **/
+
             bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
             if ((recved = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0)  
                 printf("%s\n", recv_msg.buf);

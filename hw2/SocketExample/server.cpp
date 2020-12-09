@@ -12,12 +12,12 @@
 #include <vector>
 #include <pthread.h>
 #include <errno.h>
-// #include "opencv2/opencv.hpp"
+#include "opencv2/opencv.hpp"
 
 #define BUFF_SIZE 1024
 
 using namespace std;
-// using namespace cv;
+using namespace cv;
 
 typedef struct {
     int flag;
@@ -229,7 +229,7 @@ void *doInChildThread(void *ptr) {
                 }
             }
 
-            /**
+        
             else if(strcmp(input_vec[0].c_str(), "play") == 0) {
                 if(input_vec.size() == 2) {
                     int flag = 0;
@@ -266,22 +266,26 @@ void *doInChildThread(void *ptr) {
                         if (!imgServer.isContinuous()) {
                             imgServer = imgServer.clone();
                         }
+                        
+                        typedef struct {
+                            int flag;
+                            uchar *iptr;
+                        } Frame;
 
                         int nbytes;
+                        Frame send_frame = {.flag = 0, .iptr = imgServer.data};
+
                         while(1) {      
                             cap >> imgServer;
-                            
-                            if ((nbytes = send(remoteSocket, imgServer.data, imgSize, 0)) < 0){
-                                std::cerr << "bytes = " << nbytes << std::endl;
+                            nbytes = send(remoteSocket, &send_frame, sizeof(Frame), 0);
+                            if((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0) {
+                                send_frame.flag = 1;
+                                send(remoteSocket, &send_frame, sizeof(Frame), 0));
                                 break;
-                            } 
-
-                            if((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0)
-                                break;
+                            }
                         }
                         cap.release();
 
-                        recv(remoteSocket, &recv_msg, sizeof(Msg), 0);
                         bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
                         strcpy(send_msg.buf, "Video play complete.");
                         send(remoteSocket, &send_msg, sizeof(Msg), 0);
@@ -301,7 +305,7 @@ void *doInChildThread(void *ptr) {
                     send(remoteSocket, &send_msg, sizeof(Msg), 0);
                 }
             }
-            **/
+    
 
             else{
                 bzero(send_msg.buf,sizeof(char)*BUFF_SIZE);
