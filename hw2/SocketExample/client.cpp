@@ -189,15 +189,14 @@ int main(int argc , char *argv[])
 
                         typedef struct {
                             int flag;
-                            uchar buf[imgSize];
+                            uchar *iptr;
                         } Frame;
 
-                        Frame recv_frame = {.flag = 0, .buf = {}};
+                        Frame recv_frame = {.flag = 0, .iptr = NULL};
 
                         while(1) {
-                            bzero(recv_frame.buf, sizeof(uchar)*imgSize);
                             nbytes = recv(localSocket, &recv_frame, sizeof(Frame), 0);
-                            memcpy(imgClient.data, recv_frame.buf, imgSize);
+                            memcpy(imgClient.data, recv_frame.iptr, imgSize);
                             imshow("Video", imgClient); 
                           
                             char c = (char)waitKey(33.3333);
