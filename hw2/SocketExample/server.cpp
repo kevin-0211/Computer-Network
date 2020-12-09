@@ -245,10 +245,9 @@ void *doInChildThread(void *ptr) {
                     closedir(pDir);
 
                     if(flag == 1) {
-                        bzero(,sizeof(char)*BUFF_SIZE);
-                        strcpy(Message, "file exists");
-                        send(remoteSocket,Message,strlen(Message),0);
-                        recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
+                        bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                        strcpy(send_msg.buf, "file exists");
+                        send(remoteSocket, &send_msg, sizeof(Msg), 0);
 
 
                         bzero(filename,sizeof(char)*BUFF_SIZE);
@@ -256,6 +255,8 @@ void *doInChildThread(void *ptr) {
                         strcat(filename, input_vec[1].c_str());
 
                         VideoCapture cap(filename);
+                        int width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
+                        int height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
 
                         Mat imgServer;
                         imgServer = Mat::zeros(540 , 960, CV_8UC3);   
@@ -265,13 +266,11 @@ void *doInChildThread(void *ptr) {
                         }
 
                         int nbytes;
-                        bzero(receiveMessage,sizeof(char)*BUFF_SIZE);
-
                         while(1) {      
                             int imgSize = imgServer.total() * imgServer.elemSize();
 
                             cap >> imgServer;
-                                
+                            
                             if ((nbytes = send(remoteSocket, imgServer.data, imgSize, 0)) < 0){
                                 std::cerr << "bytes = " << nbytes << std::endl;
                                 break;
@@ -291,19 +290,17 @@ void *doInChildThread(void *ptr) {
         
                     }
                     else {
-
-                        bzero(Message,sizeof(char)*BUFF_SIZE);
-                        strcpy(Message, "The file doesn't exist.");
-                        send(remoteSocket,Message,strlen(Message),0);
-                        recv(remoteSocket,receiveMessage,sizeof(char)*BUFF_SIZE,0);
-                        send(remoteSocket,Message,strlen(Message),0);
+                        bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                        strcpy(send_msg.buf, "The file doesn't exist.");
+                        send(remoteSocket, &send_msg, sizeof(Msg), 0);
+                        send(remoteSocket, &send_msg, sizeof(Msg), 0);
                     }
                 }
 
                 else {
-                    bzero(Message,sizeof(char)*BUFF_SIZE);
-                    strcpy(Message, "Command format error.");
-                    send(remoteSocket,Message,strlen(Message),0);
+                    bzero(send_msg.buf, sizeof(char)*BUFF_SIZE);
+                    strcpy(send_msg.buf, "Command format error.");
+                    send(remoteSocket, &send_msg, sizeof(Msg), 0);
                 }
             }
             **/

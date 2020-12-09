@@ -19,8 +19,8 @@ int main(int argc, char** argv){
     
     //allocate container to load frames 
     
-    imgServer = Mat::zeros(540,960, CV_8UC3);    
-    imgClient = Mat::zeros(540, 960, CV_8UC3);
+    imgServer = Mat::zeros(height, width, CV_8UC3);    
+    imgClient = Mat::zeros(height, width, CV_8UC3);
  
  
      // ensure the memory is continuous (for efficiency issue.)
