@@ -269,15 +269,16 @@ void *doInChildThread(void *ptr) {
                         
                         typedef struct {
                             int flag;
-                            uchar *iptr;
+                            uchar buf[imgSize];
                         } Frame;
 
                         int nbytes;
-                        Frame send_frame = {.flag = 0, .iptr = imgServer.data};
+                        Frame send_frame = {.flag = 0, .buf = {}};
 
                         while(1) {      
                             cap >> imgServer;
-                            send_frame.iptr = imgServer.data;
+                            bzero(send_frame.buf, sizeof(uchar)*imgSize);
+                            send_frame.buf = imgServer.data;
                             nbytes = send(remoteSocket, &send_frame, sizeof(Frame), 0);
                             if((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0) {
                                 send_frame.flag = 1;
