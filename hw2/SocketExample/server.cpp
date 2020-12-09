@@ -260,7 +260,7 @@ void *doInChildThread(void *ptr) {
                         send(remoteSocket, &send_msg, sizeof(Msg), 0);
 
                         Mat imgServer;
-                        imgServer = Mat::zeros(height, weight, CV_8UC3);   
+                        imgServer = Mat::zeros(height, width, CV_8UC3);   
                         int imgSize = imgServer.total() * imgServer.elemSize();
                         
                         if (!imgServer.isContinuous()) {
@@ -280,7 +280,7 @@ void *doInChildThread(void *ptr) {
                             nbytes = send(remoteSocket, &send_frame, sizeof(Frame), 0);
                             if((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0) {
                                 send_frame.flag = 1;
-                                send(remoteSocket, &send_frame, sizeof(Frame), 0));
+                                send(remoteSocket, &send_frame, sizeof(Frame), 0);
                                 break;
                             }
                         }
