@@ -278,7 +278,7 @@ void *doInChildThread(void *ptr) {
                         while(1) {      
                             cap >> imgServer;
                             bzero(send_frame.buf, sizeof(uchar)*imgSize);
-                            send_frame.buf = imgServer.data;
+                            memcpy(send_frame.buf, imgServer.data, imgSize);
                             nbytes = send(remoteSocket, &send_frame, sizeof(Frame), 0);
                             if((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0) {
                                 send_frame.flag = 1;

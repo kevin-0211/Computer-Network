@@ -197,7 +197,7 @@ int main(int argc , char *argv[])
                         while(1) {
                             bzero(recv_frame.buf, sizeof(uchar)*imgSize);
                             nbytes = recv(localSocket, &recv_frame, sizeof(Frame), 0);
-                            imgClient.data = recv_frame.buf;
+                            memcpy(imgClient.data, recv_frame.buf, imgSize);
                             imshow("Video", imgClient); 
                           
                             char c = (char)waitKey(33.3333);
