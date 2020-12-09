@@ -199,6 +199,7 @@ int main(int argc , char *argv[])
 
                         while(1) {
                             nbytes = recv(localSocket, &recv_frame, sizeof(Frame), 0);
+                            cout << buffer << endl;
                             memcpy(imgClient.data, ptr, imgSize);
                             imshow("Video", imgClient); 
                           
