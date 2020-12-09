@@ -177,8 +177,9 @@ int main(int argc , char *argv[])
                         int width = recv_msg.flag;
                         int height = recv_msg.nbytes;
 
-                        Mat imgClient;
+                        Mat imgClient, tmp;
                         imgClient = Mat::zeros(height, width, CV_8UC3);
+                        tmp = Mat::zeros(height, width, CV_8UC3);
 
                         int nbytes;
                         int imgSize = imgClient.total() * imgClient.elemSize();
@@ -192,7 +193,7 @@ int main(int argc , char *argv[])
                             uchar *iptr;
                         } Frame;
 
-                        Frame recv_frame = {.flag = 0, .iptr = NULL};
+                        Frame recv_frame = {.flag = 0, .iptr = tmp.data};
 
                         while(1) {
                             nbytes = recv(localSocket, &recv_frame, sizeof(Frame), 0);

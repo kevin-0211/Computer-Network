@@ -273,11 +273,10 @@ void *doInChildThread(void *ptr) {
                         } Frame;
 
                         int nbytes;
-                        Frame send_frame = {.flag = 0, .iptr = NULL};
+                        Frame send_frame = {.flag = 0, .iptr = imgServer.data};
 
                         while(1) {      
                             cap >> imgServer;
-                            send_frame.iptr = imgServer.data;
                             nbytes = send(remoteSocket, &send_frame, sizeof(Frame), 0);
                             if((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0) {
                                 send_frame.flag = 1;
