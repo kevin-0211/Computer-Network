@@ -193,13 +193,11 @@ int main(int argc , char *argv[])
                             uchar *iptr;
                         } Frame;
 
-                        uchar buffer[imgSize] = {};
                         uchar *iptr = imgClient.data;
-                        Frame recv_frame = {.flag = 0, .iptr = buffer};
+                        Frame recv_frame = {.flag = 0, .iptr = imgClient.data};
 
                         while(1) {
-                            bzero(buffer, sizeof(uchar)*imgSize);
-                            nbytes = recv(localSocket, iptr, imgSize, MSG_WAITALL);
+                            nbytes = recv(localSocket, &recv_frame, sizeof(Frame), 0);
                             imshow("Video", imgClient); 
                           
                             char c = (char)waitKey(33.3333);
@@ -212,7 +210,7 @@ int main(int argc , char *argv[])
                         destroyAllWindows();
 
                         while(1) {
-                            recv(localSocket, &recv_frame, sizeof(Frame), 0);
+                            recv(localSocket, iptr, imgSize, MSG_WAITALL);
                             if(recv_frame.flag == 1)
                                 break;
                         }
