@@ -276,7 +276,6 @@ void *doInChildThread(void *ptr) {
                             if((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0) {
                                 uchar tmp[imgSize] = {};
                                 bzero(tmp, sizeof(uchar)*imgSize);
-                                cout << tmp << endl;
                                 send(remoteSocket, tmp, imgSize, 0);
                                 break;
                             }

@@ -204,8 +204,12 @@ int main(int argc , char *argv[])
                         }   
                         destroyAllWindows();
 
+                        uchar tmp[imgSize] = {};
+                        bzero(tmp, sizeof(uchar)*imgSize);
                         while(1) {
                             recv(localSocket, iptr, imgSize, MSG_WAITALL);
+                            if(strcmp(tmp, iptr) == 0)
+                                break;
                         }
                     }
                 }
