@@ -191,6 +191,8 @@ int main(int argc , char *argv[])
 
                         while(1) {
                             recv(localSocket, &recv_msg, sizeof(Msg), 0);
+                            if(recv_msg.flag == 1)
+                                break;
                             recv(localSocket, iptr, imgSize, MSG_WAITALL);
                             imshow("Video", imgClient); 
                           
@@ -203,11 +205,13 @@ int main(int argc , char *argv[])
                         }   
                         destroyAllWindows();
 
-                        while(1) {
-                            recv(localSocket, &recv_msg, sizeof(Msg), 0);
-                            if (recv_msg.flag == 1)
-                                break;
-                            recv(localSocket, iptr, imgSize, MSG_WAITALL);
+                        if (recv_msg.flag == 0) {
+                            while(1) {
+                                recv(localSocket, &recv_msg, sizeof(Msg), 0);
+                                if (recv_msg.flag == 1)
+                                    break;
+                                recv(localSocket, iptr, imgSize, MSG_WAITALL);
+                            }
                         }
                     }
                 }

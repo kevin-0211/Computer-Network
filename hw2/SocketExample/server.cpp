@@ -270,6 +270,13 @@ void *doInChildThread(void *ptr) {
                         send_msg.flag = 0;
                         bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                         while(1) {
+                            cap >> imgServer;
+                            if (imgServer.empty()) {
+                                send_msg.flag = 1;
+                                send(remoteSocket, &send_msg, sizeof(Msg), 0);
+                                break;
+                            }
+                            
                             if ((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0) {
                                 send_msg.flag = 1;
                                 send(remoteSocket, &send_msg, sizeof(Msg), 0);
@@ -277,7 +284,7 @@ void *doInChildThread(void *ptr) {
                             }
                             else
                                 send(remoteSocket, &send_msg, sizeof(Msg), 0);
-                            cap >> imgServer;
+
                             send(remoteSocket, imgServer.data, imgSize, 0);
                         }
                         cap.release();
