@@ -177,9 +177,8 @@ int main(int argc , char *argv[])
                         int width = recv_msg.flag;
                         int height = recv_msg.nbytes;
 
-                        Mat imgClient, tmp;
+                        Mat imgClient;
                         imgClient = Mat::zeros(height, width, CV_8UC3);
-                        tmp = Mat::zeros(height, width, CV_8UC3);
 
                         int nbytes;
                         int imgSize = imgClient.total() * imgClient.elemSize();
