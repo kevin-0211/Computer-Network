@@ -190,7 +190,8 @@ int main(int argc , char *argv[])
                         uchar *iptr = imgClient.data;
 
                         while(1) {
-                            nbytes = recv(localSocket, iptr, imgSize, MSG_WAITALL);
+                            recv(localSocket, iptr, imgSize, MSG_WAITALL);
+                            recv(localSocket, &recv_msg, sizeof(Msg), 0);
 
                             imshow("Video", imgClient); 
                           
@@ -203,11 +204,10 @@ int main(int argc , char *argv[])
                         }   
                         destroyAllWindows();
 
-                        uchar tmp[imgSize] = {};
-                        bzero(tmp, sizeof(uchar)*imgSize);
                         while(1) {
                             recv(localSocket, iptr, imgSize, MSG_WAITALL);
-                            if(iptr == "")
+                            recv(localSocket, &recv_msg, sizeof(Msg), 0);
+                            if(recv_msg.flag == 1)
                                 break;
                         }
                     }

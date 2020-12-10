@@ -267,18 +267,18 @@ void *doInChildThread(void *ptr) {
                             imgServer = imgServer.clone();
                         }
                         
-
-                        int nbytes;
-
+                        send_msg.flag = 0;
+                        bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                         while(1) {      
                             cap >> imgServer;
-                            nbytes = send(remoteSocket, imgServer.data, imgSize, 0);
+                            send(remoteSocket, imgServer.data, imgSize, 0);
                             if((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0) {
-                                uchar tmp[imgSize] = {};
-                                bzero(tmp, sizeof(uchar)*imgSize);
-                                send(remoteSocket, tmp, imgSize, 0);
+                                send_msg.flag = 1;
+                                send(remoteSocket, &send_msg, sizeof(Msg), 0);
                                 break;
                             }
+                            else
+                                send(remoteSocket, &send_msg, sizeof(Msg), 0);
                         }
                         cap.release();
 
