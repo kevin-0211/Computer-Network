@@ -188,16 +188,11 @@ int main(int argc , char *argv[])
                             imgClient = imgClient.clone();
                         }
 
-                        typedef struct {
-                            int flag;
-                            uchar *iptr;
-                        } Frame;
-
                         uchar *iptr = imgClient.data;
-                        Frame recv_frame = {.flag = 0, .iptr = imgClient.data};
 
                         while(1) {
-                            nbytes = recv(localSocket, &recv_frame, sizeof(Frame), 0);
+                            nbytes = recv(localSocket, iptr, imgSize, MSG_WAITALL);
+
                             imshow("Video", imgClient); 
                           
                             char c = (char)waitKey(33.3333);
@@ -211,8 +206,6 @@ int main(int argc , char *argv[])
 
                         while(1) {
                             recv(localSocket, iptr, imgSize, MSG_WAITALL);
-                            if(recv_frame.flag == 1)
-                                break;
                         }
                     }
                 }

@@ -267,20 +267,17 @@ void *doInChildThread(void *ptr) {
                             imgServer = imgServer.clone();
                         }
                         
-                        typedef struct {
-                            int flag;
-                            uchar *iptr;
-                        } Frame;
 
                         int nbytes;
-                        Frame send_frame = {.flag = 0, .iptr = imgServer.data};
 
                         while(1) {      
                             cap >> imgServer;
-                            nbytes = send(remoteSocket, &send_frame, sizeof(Frame), 0);
+                            nbytes = send(remoteSocket, imgServer.data, imgSize, 0);
                             if((recved = recv(remoteSocket, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0) {
-                                send_frame.flag = 1;
-                                send(remoteSocket, &send_frame, sizeof(Frame), 0);
+                                uchar tmp[imgSize] = {};
+                                bzero(tmp, sizeof(uchar)*imgSize);
+                                cout << tmp << endl;
+                                send(remoteSocket, tmp, imgSize, 0);
                                 break;
                             }
                         }
