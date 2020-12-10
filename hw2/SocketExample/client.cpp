@@ -207,7 +207,7 @@ int main(int argc , char *argv[])
                         bzero(tmp, sizeof(uchar)*imgSize);
                         while(1) {
                             recv(localSocket, iptr, imgSize, MSG_WAITALL);
-                            if(strcmp(tmp, iptr) == 0)
+                            if(iptr == "")
                                 break;
                         }
                     }
