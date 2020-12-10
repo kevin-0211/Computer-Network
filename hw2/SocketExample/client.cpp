@@ -190,8 +190,8 @@ int main(int argc , char *argv[])
                         uchar *iptr = imgClient.data;
 
                         while(1) {
-                            recv(localSocket, iptr, imgSize, MSG_WAITALL);
                             recv(localSocket, &recv_msg, sizeof(Msg), 0);
+                            recv(localSocket, iptr, imgSize, MSG_WAITALL);
                             imshow("Video", imgClient); 
                           
                             char c = (char)waitKey(33.3333);
@@ -203,16 +203,11 @@ int main(int argc , char *argv[])
                         }   
                         destroyAllWindows();
 
-                        printf("phase 1\n");
-                        if(recv_msg.flag == 0) {
-                            printf("phase 2\n");
-                            while(1) {
-                                recv(localSocket, iptr, imgSize, MSG_WAITALL);
-                                printf("phase 3\n");
-                                recv(localSocket, &recv_msg, sizeof(Msg), 0);
-                                if(recv_msg.flag == 1)
-                                    break;
-                            }
+                        while(1) {
+                            recv(localSocket, &recv_msg, sizeof(Msg), 0);
+                            if (recv_msg.flag == 1)
+                                break;
+                            recv(localSocket, iptr, imgSize, MSG_WAITALL);
                         }
                     }
                 }
