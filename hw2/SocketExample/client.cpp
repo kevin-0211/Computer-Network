@@ -200,7 +200,7 @@ int main(int argc , char *argv[])
                         while(1) {
                             bzero(buffer, sizeof(uchar)*imgSize);
                             nbytes = recv(localSocket, &recv_frame, sizeof(Frame), 0);
-                            cout << recv_frame.iptr << endl;
+                            cout << buffer << endl;
                             memcpy(imgClient.data, buffer, imgSize);
                             imshow("Video", imgClient); 
                           
