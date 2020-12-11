@@ -94,7 +94,7 @@ int main(int argc, char **argv)
                         return 0;
                     }
                     std::cout << "Connection accepted" << std::endl;
-
+                    printf("remoteSocket = %d\n", remoteSocket);
                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                     strcpy(send_msg.buf, "Connection Successful!!\n");
                     send(remoteSocket, &send_msg, sizeof(Msg), 0);
