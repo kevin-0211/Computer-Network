@@ -67,13 +67,13 @@ int main(int argc , char *argv[])
     Msg send_msg = {.flag = 0, .nbytes = 0, .buf = {}};
     char input[BUFF_SIZE] = {};
     char filename[BUFF_SIZE] = {};
-    char dirname[BUFF_SIZE] = {}
+    char dirname[BUFF_SIZE] = {};
     int sent, pid;
 
     pid = getpid();
     bzero(dirname, sizeof(char) * BUFF_SIZE);
     sprintf(dirname, "./client_%d", pid);
-    printf("dirname = &s\n", dirname);
+    printf("dirname = %s\n", dirname);
 
     while(1){
         bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
