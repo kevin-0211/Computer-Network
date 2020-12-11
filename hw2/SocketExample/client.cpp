@@ -68,7 +68,7 @@ int main(int argc , char *argv[])
     char input[BUFF_SIZE] = {};
     char filename[BUFF_SIZE] = {};
     int sent;
-    
+    printf("localSocket = %d\n", localSocket);
     while(1){
         bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
         if((recved = recv(localSocket, &recv_msg, sizeof(Msg), 0)) < 0){
