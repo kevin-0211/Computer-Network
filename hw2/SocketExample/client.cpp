@@ -72,8 +72,15 @@ int main(int argc , char *argv[])
 
     pid = getpid();
     bzero(dirname, sizeof(char) * BUFF_SIZE);
-    sprintf(dirname, "./client_%d", pid);
-    printf("dirname = %s\n", dirname);
+    sprintf(dirname, "./client_%d/", pid);
+
+    // create folder
+    int check;
+    check = mkdir(dirname, 0777);
+    if (check == -1)
+        cerr << "Error :  " << strerror(errno) << endl;
+    else
+        cout << "Directory created" << endl;
 
     while(1){
         bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
@@ -114,7 +121,7 @@ int main(int argc , char *argv[])
                 int flag = 0;
                 struct dirent *pDirent;
                 DIR *pDir;
-                pDir = opendir("./client_dir");
+                pDir = opendir(dirname);
                 while((pDirent = readdir(pDir)) != NULL) {
                     if(strcmp(pDirent->d_name, input_vec[1].c_str()) == 0) {
                         flag = 1;
@@ -129,7 +136,7 @@ int main(int argc , char *argv[])
                     send(localSocket, &send_msg, sizeof(Msg), 0);
 
                     bzero(filename,sizeof(char)*BUFF_SIZE);
-                    strcpy(filename, "./client_dir/");
+                    strcpy(filename, dirname);
                     strcat(filename, input_vec[1].c_str());
                     FILE *fp = fopen(filename, "rb");
                     int nbytes;
@@ -157,7 +164,7 @@ int main(int argc , char *argv[])
                 if((recved = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
                     if(strcmp(recv_msg.buf, "file exists") == 0) {
                         bzero(filename, sizeof(char)*BUFF_SIZE);
-                        strcpy(filename, "./client_dir/");
+                        strcpy(filename, dirname);
                         strcat(filename, input_vec[1].c_str());
 
                         FILE *fp = fopen(filename, "wb");

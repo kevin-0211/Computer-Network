@@ -77,7 +77,10 @@ int main(int argc, char **argv)
     FD_ZERO(&read_fd);
     FD_SET(localSocket, &read_fd);
     max_fd = localSocket;
-    
+
+    std::cout << "Waiting for connections...\n"
+              << "Server Port:" << port << std::endl;
+
     while (1)
     {
         r = read_fd;
@@ -85,8 +88,6 @@ int main(int argc, char **argv)
         for(int i = 0; i <= max_fd; i++) {
             if(FD_ISSET(i, &r)) {
                 if(i == localSocket) {
-                    std::cout << "Waiting for connections...\n"
-                              << "Server Port:" << port << std::endl;
                     remoteSocket = accept(localSocket, (struct sockaddr *)&remoteAddr, (socklen_t *)&addrLen);
                     if (remoteSocket < 0)
                     {
@@ -102,6 +103,9 @@ int main(int argc, char **argv)
                     FD_SET(remoteSocket, &read_fd);
                     if(remoteSocket > max_fd)
                         max_fd = remoteSocket;
+
+                    std::cout << "Waiting for connections...\n"
+                              << "Server Port:" << port << std::endl;
                 }
                 else {
                     bzero(recv_msg.buf, sizeof(char) * BUFF_SIZE);
