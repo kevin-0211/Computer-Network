@@ -169,7 +169,6 @@ int main(int argc , char *argv[])
                     }
                 }
             }
-
             else if((strcmp(input_vec[0].c_str(), "play") == 0) && input_vec.size() == 2) {
                 bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
                 if((recved = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
@@ -216,7 +215,6 @@ int main(int argc , char *argv[])
                     }
                 }
             }
-
             bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
             if ((recved = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0)  
                 printf("%s\n", recv_msg.buf);
