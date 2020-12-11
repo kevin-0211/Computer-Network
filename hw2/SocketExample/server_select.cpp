@@ -268,7 +268,10 @@ int main(int argc, char **argv)
                                     if (strcmp(pDirent->d_name, input_vec[1].c_str()) == 0)
                                     {
                                         int length = strlen(input_vec[1].c_str());
-                                        if (strcmp("mpg", input_vec[1].c_str().substr(length - 3, 3)) == 0)
+                                        char type[4] = {};
+                                        bzero(type, sizeof(char) * 4);
+                                        strncpy(type, input_vec[1].c_str()+length-3, 3);
+                                        if (strcmp("mpg", type) == 0)
                                             flag = 1;
                                         else 
                                             flag = -1;
