@@ -80,7 +80,7 @@ int main(int argc , char *argv[])
     if (check == -1)
         cerr << "Error :  " << strerror(errno) << endl;
     else
-        cout << "Directory created" << endl;
+        cout << "Directory " << dirname << " created" << endl;
 
     while(1){
         bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);

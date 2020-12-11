@@ -180,13 +180,13 @@ int main(int argc, char **argv)
                                     fclose(fp);
 
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
-                                    strcpy(send_msg.buf, "File uploading complete.");
+                                    sprintf(send_msg.buf, "The %s is uploaded.", input_vec[1].c_str());
                                     send(i, &send_msg, sizeof(Msg), 0);
                                 }
                                 else
                                 {
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
-                                    strcpy(send_msg.buf, "The file doesn't exist.");
+                                    sprintf(send_msg.buf, "The %s doesn't exist.", input_vec[1].c_str());
                                     send(i, &send_msg, sizeof(Msg), 0);
                                 }
                             }
@@ -234,13 +234,13 @@ int main(int argc, char **argv)
                                     send_msg.flag = 1;
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                     send(i, &send_msg, sizeof(Msg), 0);
-                                    strcpy(send_msg.buf, "File download complete.");
+                                    sprintf(send_msg.buf, "The %s is downloaded.", input_vec[1].c_str());
                                     send(i, &send_msg, sizeof(Msg), 0);
                                 }
                                 else
                                 {
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
-                                    strcpy(send_msg.buf, "The file doesn't exist.");
+                                    sprintf(send_msg.buf, "The %s doesn't exist.", input_vec[1].c_str());
                                     send(i, &send_msg, sizeof(Msg), 0);
                                     send(i, &send_msg, sizeof(Msg), 0);
                                 }
@@ -267,7 +267,11 @@ int main(int argc, char **argv)
                                 {
                                     if (strcmp(pDirent->d_name, input_vec[1].c_str()) == 0)
                                     {
-                                        flag = 1;
+                                        int length = strlen(input_vec[1].c_str());
+                                        if (strcmp("mpg", input_vec[1].c_str().substr(length - 3, 3)) == 0)
+                                            flag = 1;
+                                        else 
+                                            flag = -1;
                                         break;
                                     }
                                 }
@@ -324,13 +328,20 @@ int main(int argc, char **argv)
                                     cap.release();
 
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
-                                    strcpy(send_msg.buf, "Video play complete.");
+                                    strcpy(send_msg.buf, "Finish playing the video.");
+                                    send(i, &send_msg, sizeof(Msg), 0);
+                                }
+                                else if (flag == -1)
+                                {
+                                    bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
+                                    sprintf(send_msg.buf, "The %s is not a mpg file.", input_vec[1].c_str());
+                                    send(i, &send_msg, sizeof(Msg), 0);
                                     send(i, &send_msg, sizeof(Msg), 0);
                                 }
                                 else
                                 {
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
-                                    strcpy(send_msg.buf, "The file doesn't exist.");
+                                    sprintf(send_msg.buf, "The %s doesn't exist.", input_vec[1].c_str());
                                     send(i, &send_msg, sizeof(Msg), 0);
                                     send(i, &send_msg, sizeof(Msg), 0);
                                 }
