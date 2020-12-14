@@ -27,8 +27,7 @@ typedef struct
     char buf[BUFF_SIZE];
 } Msg;
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     signal(SIGPIPE, SIG_IGN);
 
     int localSocket, remoteSocket, port = atoi(argv[1]), cnt = 0, max_fd;
@@ -59,8 +58,7 @@ int main(int argc, char **argv)
 
     localSocket = socket(AF_INET, SOCK_STREAM, 0);
 
-    if (localSocket == -1)
-    {
+    if (localSocket == -1) {
         printf("socket() call failed!!");
         return 0;
     }
@@ -69,8 +67,7 @@ int main(int argc, char **argv)
     localAddr.sin_addr.s_addr = INADDR_ANY;
     localAddr.sin_port = htons(port);
 
-    if (bind(localSocket, (struct sockaddr *)&localAddr, sizeof(localAddr)) < 0)
-    {
+    if (bind(localSocket, (struct sockaddr *)&localAddr, sizeof(localAddr)) < 0) {
         printf("Can't bind() socket");
         return 0;
     }
@@ -84,16 +81,14 @@ int main(int argc, char **argv)
     std::cout << "Waiting for connections...\n"
               << "Server Port:" << port << std::endl;
 
-    while (1)
-    {
+    while (1) {
         r = read_fd;
         select(max_fd+1, &r, NULL, NULL, NULL);
         for(int i = 0; i <= max_fd; i++) {
             if(FD_ISSET(i, &r)) {
                 if(i == localSocket) {
                     remoteSocket = accept(localSocket, (struct sockaddr *)&remoteAddr, (socklen_t *)&addrLen);
-                    if (remoteSocket < 0)
-                    {
+                    if (remoteSocket < 0) {
                         printf("accept failed!");
                         return 0;
                     }
@@ -101,7 +96,10 @@ int main(int argc, char **argv)
                     printf("remoteSocket = %d\n", remoteSocket);
                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                     strcpy(send_msg.buf, "Connection Successful!!\n");
-                    send(remoteSocket, &send_msg, sizeof(Msg), 0);
+                    if ((sent = send(remoteSocket, &send_msg, sizeof(Msg), 0)) == 0) {
+                        printf("Client disconnected\n");
+                        continue;
+                    }
 
                     FD_SET(remoteSocket, &read_fd);
                     if(remoteSocket > max_fd)
@@ -114,33 +112,28 @@ int main(int argc, char **argv)
                     bzero(recv_msg.buf, sizeof(char) * BUFF_SIZE);
                     recv_msg.flag = 0;
                     send_msg.flag = 0;
-                    if ((recved = recv(i, &recv_msg, sizeof(Msg), 0)) > 0)
-                    {
+                    if ((recved = recv(i, &recv_msg, sizeof(Msg), 0)) > 0) {
 
                         vector<string> input_vec;
                         char *message = new char[strlen(recv_msg.buf) + 1];
                         strcpy(message, recv_msg.buf);
                         char *tmp_str = strtok(message, " ");
-                        while (tmp_str != NULL)
-                        {
+                        while (tmp_str != NULL) {
                             input_vec.push_back(string(tmp_str));
                             tmp_str = strtok(NULL, " ");
                         }
 
-                        if (strcmp(recv_msg.buf, "exit") == 0) 
-                        {
+                        if (strcmp(recv_msg.buf, "exit") == 0) {
                             close(i);
                             FD_CLR(i, &read_fd);
                         }
 
-                        else if (strcmp(recv_msg.buf, "ls") == 0)
-                        {
+                        else if (strcmp(recv_msg.buf, "ls") == 0) {
                             bzero(dir_buf, sizeof(char) * BUFF_SIZE);
                             struct dirent *pDirent;
                             DIR *pDir;
                             pDir = opendir("./server_dir");
-                            while ((pDirent = readdir(pDir)) != NULL)
-                            {
+                            while ((pDirent = readdir(pDir)) != NULL) {
                                 if (strcmp(pDirent->d_name, ".") == 0)
                                     continue;
                                 if (strcmp(pDirent->d_name, "..") == 0)
@@ -154,16 +147,16 @@ int main(int argc, char **argv)
                                 strcpy(dir_buf, " ");
                             bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                             strcpy(send_msg.buf, dir_buf);
-                            send(i, &send_msg, sizeof(Msg), 0);
+                            if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                printf("Client disconnected\n");
+                                continue;
+                            }
                         }
 
-                        else if ((strcmp(input_vec[0].c_str(), "put") == 0) && (input_vec.size() == 2))
-                        {
+                        else if ((strcmp(input_vec[0].c_str(), "put") == 0) && (input_vec.size() == 2)) {
                             bzero(recv_msg.buf, sizeof(char) * BUFF_SIZE);
-                            if ((recved = recv(i, &recv_msg, sizeof(Msg), 0)) > 0)
-                            {
-                                if (strcmp(recv_msg.buf, "file exists") == 0)
-                                {
+                            if ((recved = recv(i, &recv_msg, sizeof(Msg), 0)) > 0) {
+                                if (strcmp(recv_msg.buf, "file exists") == 0) {
                                     bzero(filename, sizeof(char) * BUFF_SIZE);
                                     strcpy(filename, "./server_dir/");
                                     strcat(filename, input_vec[1].c_str());
@@ -171,8 +164,7 @@ int main(int argc, char **argv)
                                     FILE *fp = fopen(filename, "wb");
                                     bzero(recv_msg.buf, sizeof(char) * BUFF_SIZE);
                                     int nbytes, sum = 0;
-                                    while ((nbytes = recv(i, &recv_msg, sizeof(Msg), 0)) > 0)
-                                    {
+                                    while ((nbytes = recv(i, &recv_msg, sizeof(Msg), 0)) > 0) {
                                         if (recv_msg.flag == 1)
                                             break;
                                         sum += recv_msg.nbytes;
@@ -184,40 +176,44 @@ int main(int argc, char **argv)
 
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                     sprintf(send_msg.buf, "The %s is uploaded.", input_vec[1].c_str());
-                                    send(i, &send_msg, sizeof(Msg), 0);
+                                    if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                        printf("Client disconnected\n");
+                                        continue;
+                                    }
                                 }
                                 else
                                 {
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                     sprintf(send_msg.buf, "The %s doesn't exist.", input_vec[1].c_str());
-                                    send(i, &send_msg, sizeof(Msg), 0);
+                                    if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                        printf("Client disconnected\n");
+                                        continue;
+                                    }
                                 }
                             }
                         }
 
-                        else if (strcmp(input_vec[0].c_str(), "get") == 0)
-                        {
-                            if (input_vec.size() == 2)
-                            {
+                        else if (strcmp(input_vec[0].c_str(), "get") == 0) {
+                            if (input_vec.size() == 2) {
                                 int flag = 0;
                                 struct dirent *pDirent;
                                 DIR *pDir;
                                 pDir = opendir("./server_dir");
-                                while ((pDirent = readdir(pDir)) != NULL)
-                                {
-                                    if (strcmp(pDirent->d_name, input_vec[1].c_str()) == 0)
-                                    {
+                                while ((pDirent = readdir(pDir)) != NULL) {
+                                    if (strcmp(pDirent->d_name, input_vec[1].c_str()) == 0) {
                                         flag = 1;
                                         break;
                                     }
                                 }
                                 closedir(pDir);
 
-                                if (flag == 1)
-                                {
+                                if (flag == 1) {
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                     strcpy(send_msg.buf, "file exists");
-                                    send(i, &send_msg, sizeof(Msg), 0);
+                                    if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                        printf("Client disconnected\n");
+                                        continue;
+                                    }
 
                                     bzero(filename, sizeof(char) * BUFF_SIZE);
                                     strcpy(filename, "./server_dir/");
@@ -225,51 +221,67 @@ int main(int argc, char **argv)
 
                                     FILE *fp = fopen(filename, "rb");
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
-                                    int nbytes, sum;
+                                    int nbytes, sum, flag = 0;
                                     while ((nbytes = fread(send_msg.buf, sizeof(char), BUFF_SIZE, fp)) > 0)
                                     {
                                         send_msg.nbytes = nbytes;
-                                        send(i, &send_msg, sizeof(Msg), 0);
+                                        if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                            printf("Client disconnected\n");
+                                            flag = 1;
+                                            break;
+                                        }
                                         bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                     }
                                     fclose(fp);
+                                    if (flag == 1)
+                                        continue;
 
                                     send_msg.flag = 1;
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
-                                    send(i, &send_msg, sizeof(Msg), 0);
+                                    if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                        printf("Client disconnected\n");
+                                        continue;
+                                    }
                                     sprintf(send_msg.buf, "The %s is downloaded.", input_vec[1].c_str());
-                                    send(i, &send_msg, sizeof(Msg), 0);
+                                    if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                        printf("Client disconnected\n");
+                                        continue;
+                                    }
                                 }
                                 else
                                 {
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                     sprintf(send_msg.buf, "The %s doesn't exist.", input_vec[1].c_str());
-                                    send(i, &send_msg, sizeof(Msg), 0);
-                                    send(i, &send_msg, sizeof(Msg), 0);
+                                    if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                        printf("Client disconnected\n");
+                                        continue;
+                                    }
+                                    if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                        printf("Client disconnected\n");
+                                        continue;
+                                    }
                                 }
                             }
 
-                            else
-                            {
+                            else {
                                 bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                 strcpy(send_msg.buf, "Command format error.");
-                                send(i, &send_msg, sizeof(Msg), 0);
+                                if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                    printf("Client disconnected\n");
+                                    continue;
+                                }
                             }
                         }
 
                     
-                        else if (strcmp(input_vec[0].c_str(), "play") == 0)
-                        {
-                            if (input_vec.size() == 2)
-                            {
+                        else if (strcmp(input_vec[0].c_str(), "play") == 0) {
+                            if (input_vec.size() == 2) {
                                 int flag = 0;
                                 struct dirent *pDirent;
                                 DIR *pDir;
                                 pDir = opendir("./server_dir");
-                                while ((pDirent = readdir(pDir)) != NULL)
-                                {
-                                    if (strcmp(pDirent->d_name, input_vec[1].c_str()) == 0)
-                                    {
+                                while ((pDirent = readdir(pDir)) != NULL) {
+                                    if (strcmp(pDirent->d_name, input_vec[1].c_str()) == 0) {
                                         int length = strlen(input_vec[1].c_str());
                                         char type[4] = {};
                                         bzero(type, sizeof(char) * 4);
@@ -283,8 +295,7 @@ int main(int argc, char **argv)
                                 }
                                 closedir(pDir);
 
-                                if (flag == 1)
-                                {
+                                if (flag == 1) {
                                     bzero(filename, sizeof(char) * BUFF_SIZE);
                                     strcpy(filename, "./server_dir/");
                                     strcat(filename, input_vec[1].c_str());
@@ -297,75 +308,108 @@ int main(int argc, char **argv)
                                     send_msg.flag = width;
                                     send_msg.nbytes = height;
                                     strcpy(send_msg.buf, "file exists");
-                                    send(i, &send_msg, sizeof(Msg), 0);
+                                    if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                        printf("Client disconnected\n");
+                                        continue;
+                                    }
 
                                     Mat imgServer;
                                     imgServer = Mat::zeros(height, width, CV_8UC3);
                                     int imgSize = imgServer.total() * imgServer.elemSize();
 
-                                    if (!imgServer.isContinuous())
-                                    {
+                                    if (!imgServer.isContinuous()) {
                                         imgServer = imgServer.clone();
                                     }
 
+                                    int flag = 0;
                                     send_msg.flag = 0;
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
-                                    while (1)
-                                    {
+                                    while (1) {
                                         cap >> imgServer;
-                                        if (imgServer.empty())
-                                        {
+                                        if (imgServer.empty()) {
                                             send_msg.flag = 1;
-                                            send(i, &send_msg, sizeof(Msg), 0);
+                                            if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                                printf("Client disconnected\n");
+                                                flag = 1;
+                                            }
                                             break;
                                         }
 
-                                        if ((recved = recv(i, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0)
-                                        {
+                                        if ((recved = recv(i, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0) {
                                             send_msg.flag = 1;
-                                            send(i, &send_msg, sizeof(Msg), 0);
+                                            if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                                printf("Client disconnected\n");
+                                                flag = 1;
+                                            }
                                             break;
                                         }
-                                        else
-                                            send(i, &send_msg, sizeof(Msg), 0);
-
-                                        send(i, imgServer.data, imgSize, 0);
+                                        else {
+                                            if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                                printf("Client disconnected\n");
+                                                flag = 1;
+                                                break;
+                                            }
+                                        }
+                                        if ((sent = send(i, imgServer.data, imgSize, 0)) == 0) {
+                                            printf("Client disconnected\n");
+                                            flag = 1;
+                                            break;
+                                        }
                                     }
                                     cap.release();
+                                    if (flag == 1)
+                                        continue;
 
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                     strcpy(send_msg.buf, "Finish playing the video.");
-                                    send(i, &send_msg, sizeof(Msg), 0);
+                                    if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                        printf("Client disconnected\n");
+                                        continue;
+                                    }
                                 }
-                                else if (flag == -1)
-                                {
+                                else if (flag == -1) {
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                     sprintf(send_msg.buf, "The %s is not a mpg file.", input_vec[1].c_str());
-                                    send(i, &send_msg, sizeof(Msg), 0);
-                                    send(i, &send_msg, sizeof(Msg), 0);
+                                    if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                        printf("Client disconnected\n");
+                                        continue;
+                                    }
+                                    if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                        printf("Client disconnected\n");
+                                        continue;
+                                    }
                                 }
-                                else
-                                {
+                                else {
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                     sprintf(send_msg.buf, "The %s doesn't exist.", input_vec[1].c_str());
-                                    send(i, &send_msg, sizeof(Msg), 0);
-                                    send(i, &send_msg, sizeof(Msg), 0);
+                                    if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                        printf("Client disconnected\n");
+                                        continue;
+                                    }
+                                    if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                        printf("Client disconnected\n");
+                                        continue;
+                                    }
                                 }
                             }
 
-                            else
-                            {
+                            else {
                                 bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                 strcpy(send_msg.buf, "Command format error.");
-                                send(i, &send_msg, sizeof(Msg), 0);
+                                if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                    printf("Client disconnected\n");
+                                    continue;
+                                }
                             }
                         }
 
-                        else
-                        {
+                        else {
                             bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                             strcpy(send_msg.buf, "Command not found.");
-                            send(i, &send_msg, sizeof(Msg), 0);
+                            if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
+                                printf("Client disconnected\n");
+                                continue;
+                            }
                         }
                     }
                 }
