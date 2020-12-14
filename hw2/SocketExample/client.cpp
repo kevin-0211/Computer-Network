@@ -20,7 +20,6 @@
 using namespace std;
 using namespace cv;
 
-signal(SIGPIPE, SIG_IGN);
 
 typedef struct {
     int flag;
