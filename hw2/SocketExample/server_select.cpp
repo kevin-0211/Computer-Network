@@ -11,12 +11,15 @@
 #include <dirent.h>
 #include <vector>
 #include <errno.h>
+#include <signal.h>
 #include "opencv2/opencv.hpp"
 
 #define BUFF_SIZE 1024
 
 using namespace std;
 using namespace cv;
+
+signal(SIGPIPE, SIG_IGN);
 
 typedef struct
 {
@@ -368,7 +371,6 @@ int main(int argc, char **argv)
                 }
             }
         }
-
     }
     return 0;
 }

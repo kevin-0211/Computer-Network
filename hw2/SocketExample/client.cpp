@@ -12,12 +12,15 @@
 #include <vector>
 #include <pthread.h>
 #include <errno.h>
+#include <signal.h>
 #include "opencv2/opencv.hpp"
 
 #define BUFF_SIZE 1024
 
 using namespace std;
 using namespace cv;
+
+signal(SIGPIPE, SIG_IGN);
 
 typedef struct {
     int flag;
