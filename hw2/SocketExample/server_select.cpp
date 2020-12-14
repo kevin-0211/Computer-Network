@@ -19,7 +19,6 @@
 using namespace std;
 using namespace cv;
 
-signal(SIGPIPE, SIG_IGN);
 
 typedef struct
 {
@@ -30,6 +29,7 @@ typedef struct
 
 int main(int argc, char **argv)
 {
+    signal(SIGPIPE, SIG_IGN);
 
     int localSocket, remoteSocket, port = atoi(argv[1]), cnt = 0, max_fd;
 
