@@ -28,6 +28,7 @@ typedef struct
 } Msg;
 
 int main(int argc, char **argv) {
+    signal(SIGPIPE, SIG_IGN);
 
     int localSocket, remoteSocket, port = atoi(argv[1]), cnt = 0, max_fd;
 
