@@ -220,19 +220,19 @@ int main(int argc, char **argv) {
 
                                     FILE *fp = fopen(filename, "rb");
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
-                                    int nbytes, sum, flag = 0;
+                                    int nbytes, sum, cnt = 0;
                                     while ((nbytes = fread(send_msg.buf, sizeof(char), BUFF_SIZE, fp)) > 0)
                                     {
                                         send_msg.nbytes = nbytes;
                                         if ((sent = send(i, &send_msg, sizeof(Msg), 0)) <= 0) {
                                             printf("Client disconnected\n");
-                                            flag = 1;
+                                            cnt = 1;
                                             break;
                                         }
                                         bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                     }
                                     fclose(fp);
-                                    if (flag == 1)
+                                    if (cnt == 1)
                                         continue;
 
                                     send_msg.flag = 1;
@@ -320,7 +320,7 @@ int main(int argc, char **argv) {
                                         imgServer = imgServer.clone();
                                     }
 
-                                    int flag = 0;
+                                    int cnt = 0;
                                     send_msg.flag = 0;
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                     while (1) {
@@ -328,7 +328,7 @@ int main(int argc, char **argv) {
                                         if (imgServer.empty()) {
                                             send_msg.flag = 1;
                                             if ((sent = send(i, &send_msg, sizeof(Msg), 0)) <= 0) {
-                                                flag = 1;
+                                                cnt = 1;
                                             }
                                             break;
                                         }
@@ -336,24 +336,26 @@ int main(int argc, char **argv) {
                                         if ((recved = recv(i, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0) {
                                             send_msg.flag = 1;
                                             if ((sent = send(i, &send_msg, sizeof(Msg), 0)) <= 0) {
-                                                flag = 1;
+                                                cnt = 1;
                                             }
                                             break;
                                         }
                                         else {
                                             if ((sent = send(i, &send_msg, sizeof(Msg), 0)) <= 0) {
-                                                flag = 1;
+                                                cnt = 1;
                                                 break;
                                             }
                                         }
                                         if ((sent = send(i, imgServer.data, imgSize, 0)) <= 0) {
-                                            flag = 1;
+                                            cnt = 1;
                                             break;
                                         }
                                     }
                                     cap.release();
-                                    if (flag == 1) {
+                                    if (cnt == 1) {
                                         printf("Client disconnected\n");
+                                        close(i);
+                                        FD_CLR(i, &read_fd);
                                         continue;
                                     }
 
