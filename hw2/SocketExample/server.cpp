@@ -224,7 +224,7 @@ int main(int argc, char **argv) {
                                     while ((nbytes = fread(send_msg.buf, sizeof(char), BUFF_SIZE, fp)) > 0)
                                     {
                                         send_msg.nbytes = nbytes;
-                                        if ((sent = send(i, &send_msg, sizeof(Msg), 0)) <= 0) {
+                                        if ((sent = send(i, &send_msg, sizeof(Msg)*1, 0)) <= 0) {
                                             cnt = 1;
                                             break;
                                         }
