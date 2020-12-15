@@ -15,7 +15,7 @@
 #include <signal.h>
 #include "opencv2/opencv.hpp"
 
-#define BUFF_SIZE 4096
+#define BUFF_SIZE 1024
 
 using namespace std;
 using namespace cv;
@@ -175,7 +175,8 @@ int main(int argc , char *argv[])
                         while((nbytes = recv(localSocket, &recv_msg, sizeof(Msg), 0)) > 0) {
                             if(recv_msg.flag == 1)
                                 break;
-                            
+                            sum += recv_msg.nbytes;
+                            printf("sum = %d\n", sum);
                             fwrite(recv_msg.buf, sizeof(char), recv_msg.nbytes, fp);
                             bzero(recv_msg.buf, sizeof(char)*BUFF_SIZE);
                         }
