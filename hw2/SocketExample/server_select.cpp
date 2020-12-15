@@ -181,8 +181,7 @@ int main(int argc, char **argv) {
                                         continue;
                                     }
                                 }
-                                else
-                                {
+                                else {
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                     sprintf(send_msg.buf, "The %s doesn't exist.", input_vec[1].c_str());
                                     if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
@@ -329,7 +328,6 @@ int main(int argc, char **argv) {
                                         if (imgServer.empty()) {
                                             send_msg.flag = 1;
                                             if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
-                                                printf("Client disconnected\n");
                                                 flag = 1;
                                             }
                                             break;
@@ -338,27 +336,26 @@ int main(int argc, char **argv) {
                                         if ((recved = recv(i, &recv_msg, sizeof(Msg), MSG_DONTWAIT)) > 0) {
                                             send_msg.flag = 1;
                                             if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
-                                                printf("Client disconnected\n");
                                                 flag = 1;
                                             }
                                             break;
                                         }
                                         else {
                                             if ((sent = send(i, &send_msg, sizeof(Msg), 0)) == 0) {
-                                                printf("Client disconnected\n");
                                                 flag = 1;
                                                 break;
                                             }
                                         }
                                         if ((sent = send(i, imgServer.data, imgSize, 0)) == 0) {
-                                            printf("Client disconnected\n");
                                             flag = 1;
                                             break;
                                         }
                                     }
                                     cap.release();
-                                    if (flag == 1)
+                                    if (flag == 1) {
+                                        printf("Client disconnected\n");
                                         continue;
+                                    }
 
                                     bzero(send_msg.buf, sizeof(char) * BUFF_SIZE);
                                     strcpy(send_msg.buf, "Finish playing the video.");
