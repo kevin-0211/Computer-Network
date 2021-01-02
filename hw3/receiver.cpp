@@ -105,7 +105,7 @@ int main(int argc, char* argv[]){
         }
         memset(&s_tmp, 0, sizeof(s_tmp));
         segment_size = recvfrom(receiversocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&tmp_addr, &tmp_size);
-        cout << s_tmp.data << endl;
+        
         if(segment_size > 0){
             if (s_tmp.head.fin == 1) {
                 printf("recv	fin\n");
@@ -118,7 +118,7 @@ int main(int argc, char* argv[]){
             }
             cnt = s_tmp.head.seqNumber;
             if (cnt == num + 1) {
-                tmp = cnt % frame - 1;
+                tmp = cnt - 1;
                 memcpy(&imgClient.data[tmp*4096], s_tmp.data, s_tmp.head.length);
                 printf("recv	data	#%d\n", cnt);
                 memset(&s_tmp, 0, sizeof(s_tmp));
