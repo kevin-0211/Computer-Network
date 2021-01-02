@@ -95,9 +95,7 @@ int main(int argc, char* argv[]) {
     Mat imgServer;
     imgServer = Mat::zeros(height, width, CV_8UC3);
     int imgSize = imgServer.total() * imgServer.elemSize();
-    
-
-    
+    printf("height = %d, width = %d\n", height, width);
 
     if (!imgServer.isContinuous()) {
         imgServer = imgServer.clone();
