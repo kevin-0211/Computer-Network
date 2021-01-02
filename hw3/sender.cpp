@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
 
     int recv, nbytes, cnt = 1, window = 1, num, i, j;
     int frame = imgSize / 4096 + 1;
-    printf("size = %d\n", sizeof(imgServer.data));
+    
     struct timeval tv;
     tv.tv_sec = 0;
     tv.tv_usec = 100000;
@@ -142,13 +142,13 @@ int main(int argc, char* argv[]) {
             if (j < i) {
                 window = 1;
                 cnt = num+1;
-                tmp = cnt % frame - 1;
             }
             else {
                 window += 1;
                 if (cnt % frame == 1 && cnt > 1)
                     break;
             }  
+            tmp = cnt % frame - 1;
         }
     }
 
