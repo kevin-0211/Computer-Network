@@ -129,6 +129,7 @@ int main(int argc, char* argv[]) {
                     memcpy(s_tmp.data, &imgServer.data[tmp*4096], 4096);    
                     s_tmp.head.length = 4096;
                 }
+                cout << s_tmp.data << endl;
                 s_tmp.head.seqNumber = cnt;
                 s_tmp.head.fin = 0;
                 s_tmp.head.ack = 0;

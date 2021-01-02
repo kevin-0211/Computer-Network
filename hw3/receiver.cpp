@@ -105,6 +105,7 @@ int main(int argc, char* argv[]){
         }
         memset(&s_tmp, 0, sizeof(s_tmp));
         segment_size = recvfrom(receiversocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&tmp_addr, &tmp_size);
+        cout << s_tmp.data << endl;
         if(segment_size > 0){
             if (s_tmp.head.fin == 1) {
                 printf("recv	fin\n");
