@@ -121,6 +121,7 @@ int main(int argc, char* argv[]) {
                 if (cnt % frame == 1 && cnt > 1)
                     break;
                 memset(&s_tmp, 0, sizeof(s_tmp));
+                bzero(s_tmp.data, 4096);
                 memcpy(s_tmp.data, imgServer.data[tmp*4096], 4096);    
                 s_tmp.head.length = 4096;
                 s_tmp.head.seqNumber = cnt;
