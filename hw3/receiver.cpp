@@ -98,10 +98,14 @@ int main(int argc, char* argv[]){
     
     int nbytes, cnt = 1, num = 1, tmp = 0;
     int frame = imgSize / 4096 + 1;
+    uchar *buf = new uchar[imgSize];
     while(1){
         /*Receive message from receiver and sender*/
         if (num % frame == 0) {
-            cout << imgClient.data << endl;
+            for (int x = 0; x < 540; x++)
+                for (int y = 0; y < 960; y++)
+                    for (int z = 0; z < 3; z++)
+                        imgClient.at<Vec3b>(i, j)[k] = buf[x*width*3+y*3+z];
             imshow("Video", imgClient); 
             tmp = 0;
         }
@@ -120,7 +124,7 @@ int main(int argc, char* argv[]){
             }
             cnt = s_tmp.head.seqNumber;
             if (cnt == num + 1) {
-                memcpy(&imgClient[tmp*4096], s_tmp.data, s_tmp.head.length);
+                memcpy(&buf[tmp*4096], s_tmp.data, s_tmp.head.length);
                 printf("recv	data	#%d\n", cnt);
                 memset(&s_tmp, 0, sizeof(s_tmp));
                 s_tmp.head.ack = 1;

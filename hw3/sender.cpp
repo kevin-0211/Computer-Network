@@ -94,8 +94,7 @@ int main(int argc, char* argv[]) {
     Mat imgServer;
     imgServer = Mat::zeros(height, width, CV_8UC3);
     int imgSize = imgServer.total() * imgServer.elemSize();
-    printf("height = %d, width = %d\n", height, width);
-
+    
     if (!imgServer.isContinuous()) {
         imgServer = imgServer.clone();
     }
@@ -112,9 +111,14 @@ int main(int argc, char* argv[]) {
     }
 
     while (1) {
+        uchar *buf = new uchar[imgSize];
         cap >> imgServer;
         if (imgServer.empty())
             break;
+        for (int x = 0; x < height; x++)
+            for (int y = 0; y < width; y++)
+                for (int z = 0; z < 3; z++)
+                    buf[x*width*3+y*3+z] = imgServer.at<Vec3b>(i, j)[k];
         
         int tmp = 0;
         while (1) {
@@ -123,11 +127,11 @@ int main(int argc, char* argv[]) {
                     break;
                 memset(&s_tmp, 0, sizeof(s_tmp));
                 if (tmp == frame - 1) {
-                    memcpy(s_tmp.data, &imgServer[tmp*4096], rest);
+                    memcpy(s_tmp.data, &buf[tmp*4096], rest);
                     s_tmp.head.length = rest;
                 }
                 else {
-                    memcpy(s_tmp.data, &imgServer[tmp*4096], 4096);   
+                    memcpy(s_tmp.data, &buf[tmp*4096], 4096);   
                     s_tmp.head.length = 4096;
                 }
                 
