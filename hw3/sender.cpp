@@ -121,7 +121,7 @@ int main(int argc, char* argv[]) {
                 if (tmp % frame == 0 && tmp > 0)
                     break;
                 memset(&s_tmp, 0, sizeof(s_tmp));
-                if (tmp % frame == 0 && tmp > 0) {
+                if (tmp == frame - 1) {
                     memcpy(s_tmp.data, &imgServer.data[tmp*4096], rest);    
                     s_tmp.head.length = rest;
                 }
@@ -152,7 +152,7 @@ int main(int argc, char* argv[]) {
             }
             else {
                 window += 1;
-                if (cnt % frame == 1 && cnt > 1)
+                if (tmp % frame == 0 && tmp > 0)
                     break;
             }  
             tmp = num;
