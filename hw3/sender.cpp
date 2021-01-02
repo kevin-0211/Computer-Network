@@ -118,10 +118,10 @@ int main(int argc, char* argv[]) {
         int tmp = 0;
         while (1) {
             for (i = 0; i < window; i++) {
-                if (cnt % frame == 1 && cnt > 1)
+                if (tmp % frame == 0 && tmp > 0)
                     break;
                 memset(&s_tmp, 0, sizeof(s_tmp));
-                if (cnt % frame == 0 && cnt > 0) {
+                if (tmp % frame == 0 && tmp > 0) {
                     memcpy(s_tmp.data, &imgServer.data[tmp*4096], rest);    
                     s_tmp.head.length = rest;
                 }
