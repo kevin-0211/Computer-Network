@@ -123,13 +123,11 @@ int main(int argc, char* argv[]) {
                     break;
                 memset(&s_tmp, 0, sizeof(s_tmp));
                 if (tmp == frame - 1) {
-                    for (int k = 0; k < rest; k++)
-                        s_tmp.data[k] = imgServer.data[tmp*4096+k];
+                    memcpy(s_tmp.data, &imgServer[tmp*4096], rest);
                     s_tmp.head.length = rest;
                 }
                 else {
-                    for (int k = 0; k < 4096; k++)
-                        s_tmp.data[k] = imgServer.data[tmp*4096+k];   
+                    memcpy(s_tmp.data, &imgServer[tmp*4096], 4096);   
                     s_tmp.head.length = 4096;
                 }
                 cout << s_tmp.data << endl;
