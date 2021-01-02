@@ -122,6 +122,7 @@ int main(int argc, char* argv[]){
             if (cnt == num + 1) {
                 for (int k = 0; k < s_tmp.head.length; k++)
                     imgClient.data[tmp*4096+k] = s_tmp.data[k];
+                imshow("Video", imgClient);
                 printf("recv	data	#%d\n", cnt);
                 memset(&s_tmp, 0, sizeof(s_tmp));
                 s_tmp.head.ack = 1;
