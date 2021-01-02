@@ -96,12 +96,13 @@ int main(int argc, char* argv[]){
         imgClient = imgClient.clone();
     }
     
-    int nbytes, cnt = 1, num = 1, tmp;
+    int nbytes, cnt = 1, num = 1, tmp = 0;
     int frame = imgSize / 4096 + 1;
     while(1){
         /*Receive message from receiver and sender*/
         if (num % frame == 0) {
             imshow("Video", imgClient); 
+            tmp = 0;
         }
         memset(&s_tmp, 0, sizeof(s_tmp));
         segment_size = recvfrom(receiversocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&tmp_addr, &tmp_size);
@@ -118,7 +119,6 @@ int main(int argc, char* argv[]){
             }
             cnt = s_tmp.head.seqNumber;
             if (cnt == num + 1) {
-                tmp = cnt - 1;
                 memcpy(&imgClient.data[tmp*4096], s_tmp.data, s_tmp.head.length);
                 printf("recv	data	#%d\n", cnt);
                 memset(&s_tmp, 0, sizeof(s_tmp));
@@ -128,6 +128,7 @@ int main(int argc, char* argv[]){
                 sendto(receiversocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&agent, agent_size);
                 printf("send	ack 	#%d\n", s_tmp.head.ackNumber);
                 num = cnt;
+                tmp += 1;
             }
             else {
                 printf("drop	data	#%d\n", cnt);

@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
     }
 
 
-    int recv, nbytes, cnt = 1, window = 1, tmp = 0, num, i, j;
+    int recv, nbytes, cnt = 1, window = 1, num, i, j;
     int frame = imgSize / 4096 + 1, rest = imgSize - (frame - 1) * 4096;
     
     struct timeval tv;
@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
         cap >> imgServer;
         if (imgServer.empty())
             break;
-
+        int tmp = 0;
         while (1) {
             for (i = 0; i < window; i++) {
                 if (cnt % frame == 1 && cnt > 1)
@@ -136,6 +136,7 @@ int main(int argc, char* argv[]) {
                 sendto(sendersocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&agent, agent_size);
                 printf("send	data	#%d\n", cnt);
                 cnt += 1;
+                tmp += 1;
             }
             for (j = 0; j < i; j++) {
                 memset(&s_tmp, 0, sizeof(s_tmp));
@@ -154,7 +155,7 @@ int main(int argc, char* argv[]) {
                 if (cnt % frame == 1 && cnt > 1)
                     break;
             }  
-            tmp = cnt % frame - 1;
+            tmp = num;
         }
     }
 
