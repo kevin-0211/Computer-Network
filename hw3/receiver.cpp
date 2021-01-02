@@ -89,14 +89,14 @@ int main(int argc, char* argv[]){
     FILE *fp = fopen("./recv/test.mpg", "wb");
     
     Mat imgClient;
-    imgClient = Mat::zeros(height, width, CV_8UC3);
+    imgClient = Mat::zeros(540, 960, CV_8UC3);
 
     int imgSize = imgClient.total() * imgClient.elemSize();
 
     if(!imgClient.isContinuous()){
         imgClient = imgClient.clone();
     }
-    printf("height = %d, width = %d\n", height, width);
+    
     int nbytes, cnt = 1, num = 0;
     while(1){
         /*Receive message from receiver and sender*/
