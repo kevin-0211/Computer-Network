@@ -22,7 +22,7 @@ typedef struct {
 
 typedef struct{
 	header head;
-	char data[4096];
+	uchar data[4096];
 } segment;
 
 void setIP(char *dst, char *src) {
@@ -87,7 +87,6 @@ int main(int argc, char* argv[]) {
     int segment_size, index;
     srand(time(NULL));
     
-    FILE *fp = fopen(filename, "rb");
     
     VideoCapture cap(filename);
     int width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
@@ -102,8 +101,8 @@ int main(int argc, char* argv[]) {
     }
 
 
-    int recv, nbytes, cnt = 1, window = 1, flag = 0, num, i, j;
-
+    int recv, nbytes, cnt = 1, window = 1, num, i, j;
+    int frame = imgSize / 4096 + 1;
     struct timeval tv;
     tv.tv_sec = 0;
     tv.tv_usec = 100000;
@@ -112,42 +111,45 @@ int main(int argc, char* argv[]) {
     }
 
     while (1) {
-        for (i = 0; i < window; i++) {
-            memset(&s_tmp, 0, sizeof(s_tmp));
-            nbytes = fread(s_tmp.data, sizeof(char), 4096, fp);
-            if (nbytes <= 0) {
-                flag = 1;
-                break;
+        cap >> imgServer;
+        if (imgServer.empty())
+            break;
+
+        int tmp = 0;
+        while (1) {
+            for (i = 0; i < window; i++) {
+                if (cnt % frame == 1 && cnt > 1)
+                    break;
+                memset(&s_tmp, 0, sizeof(s_tmp));
+                memcpy(s_tmp.data, imgServer.data[tmp*4096], 4096);    
+                s_tmp.head.length = 4096;
+                s_tmp.head.seqNumber = cnt;
+                s_tmp.head.fin = 0;
+                s_tmp.head.ack = 0;
+                sendto(sendersocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&agent, agent_size);
+                printf("send	data	#%d\n", cnt);
+                cnt += 1;
             }
-            s_tmp.head.length = nbytes;
-            s_tmp.head.seqNumber = cnt;
-            s_tmp.head.fin = 0;
-            s_tmp.head.ack = 0;
-            sendto(sendersocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&agent, agent_size);
-            printf("send	data	#%d\n", cnt);
-            cnt += 1;
+            for (j = 0; j < i; j++) {
+                memset(&s_tmp, 0, sizeof(s_tmp));
+                recv = recvfrom(sendersocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&tmp_addr, &tmp_size);
+                if (recv < 0)
+                    break;
+                printf("recv     ack	#%d\n", s_tmp.head.ackNumber);
+                num = s_tmp.head.ackNumber;
+            }
+            if (j < i) {
+                window = 1;
+                cnt = num+1;
+                tmp = cnt % frame - 1;
+            }
+            else {
+                window += 1;
+                if (cnt % frame == 1 && cnt > 1)
+                    break;
+            }  
         }
-        for (j = 0; j < i; j++) {
-            memset(&s_tmp, 0, sizeof(s_tmp));
-            recv = recvfrom(sendersocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&tmp_addr, &tmp_size);
-            if (recv < 0)
-                break;
-            printf("recv     ack	#%d\n", s_tmp.head.ackNumber);
-            num = s_tmp.head.ackNumber;
-        }
-        if (j < i) {
-            window = 1;
-            cnt = num+1;
-            flag = 0;
-            fseek(fp, 4096*num, SEEK_SET);
-        }
-        else {
-            window += 1;
-            if (flag == 1)
-                break;
-        }  
     }
-    fclose(fp);
 
     memset(&s_tmp, 0, sizeof(s_tmp));
     s_tmp.head.fin = 1;

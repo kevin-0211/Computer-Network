@@ -22,7 +22,7 @@ typedef struct {
 
 typedef struct{
 	header head;
-	char data[4096];
+	uchar data[4096];
 } segment;
 
 void setIP(char *dst, char *src) {
@@ -86,7 +86,6 @@ int main(int argc, char* argv[]){
     int segment_size, index;
     srand(time(NULL));
 
-    FILE *fp = fopen("./recv/test.mpg", "wb");
     
     Mat imgClient;
     imgClient = Mat::zeros(540, 960, CV_8UC3);
@@ -98,8 +97,12 @@ int main(int argc, char* argv[]){
     }
     
     int nbytes, cnt = 1, num = 0;
+    int frame = imgSize / 4096 + 1;
     while(1){
         /*Receive message from receiver and sender*/
+        if (num % frame == 0) {
+            imshow("Video", imgClient); 
+        }
         memset(&s_tmp, 0, sizeof(s_tmp));
         segment_size = recvfrom(receiversocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&tmp_addr, &tmp_size);
         if(segment_size > 0){
@@ -114,7 +117,8 @@ int main(int argc, char* argv[]){
             }
             cnt = s_tmp.head.seqNumber;
             if (cnt == num + 1) {
-                fwrite(s_tmp.data, sizeof(char), s_tmp.head.length, fp);
+                tmp = cnt % frame - 1;
+                memcpy(imgClient.data[tmp*4096], s_tmp.data, 4096);
                 printf("recv	data	#%d\n", cnt);
                 memset(&s_tmp, 0, sizeof(s_tmp));
                 s_tmp.head.ack = 1;
@@ -135,6 +139,6 @@ int main(int argc, char* argv[]){
             }
         }
     }
-    fclose(fp);
+    destroyAllWindows();
     return 0;
 }
