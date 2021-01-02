@@ -120,6 +120,7 @@ int main(int argc, char* argv[]){
             }
             cnt = s_tmp.head.seqNumber;
             if (cnt == num + 1) {
+                cout << s_tmp.data << endl;
                 memcpy(&imgClient.data[tmp*4096], s_tmp.data, sizeof(uchar) * s_tmp.head.length);
                 printf("recv	data	#%d\n", cnt);
                 memset(&s_tmp, 0, sizeof(s_tmp));
