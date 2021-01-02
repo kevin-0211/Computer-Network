@@ -6,10 +6,10 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <string.h>
-// #include "opencv2/opencv.hpp"
+#include "opencv2/opencv.hpp"
 
-//using namespace std;
-//using namespace cv;
+using namespace std;
+using namespace cv;
 
 typedef struct {
 	int length;
@@ -88,20 +88,21 @@ int main(int argc, char* argv[]) {
     srand(time(NULL));
     
     FILE *fp = fopen(filename, "rb");
-    /**
+    
     VideoCapture cap(filename);
     int width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
     int height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
     Mat imgServer;
     imgServer = Mat::zeros(height, width, CV_8UC3);
     int imgSize = imgServer.total() * imgServer.elemSize();
-    **/
     
-    /**
+
+    
+
     if (!imgServer.isContinuous()) {
         imgServer = imgServer.clone();
     }
-    **/
+
 
     int recv, nbytes, cnt = 1, window = 1, flag = 0, num, i, j;
 

@@ -18,6 +18,10 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <string.h>
+#include "opencv2/opencv.hpp"
+
+using namespace std;
+using namespace cv;
 
 
 typedef struct {

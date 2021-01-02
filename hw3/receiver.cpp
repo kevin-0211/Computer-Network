@@ -6,10 +6,10 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <string.h>
-//#include "opencv2/opencv.hpp"
+#include "opencv2/opencv.hpp"
 
-//using namespace std;
-//using namespace cv;
+using namespace std;
+using namespace cv;
 
 typedef struct {
 	int length;
@@ -87,7 +87,7 @@ int main(int argc, char* argv[]){
     srand(time(NULL));
 
     FILE *fp = fopen("./recv/test.mpg", "wb");
-    /**
+    
     Mat imgClient;
     imgClient = Mat::zeros(height, width, CV_8UC3);
 
@@ -96,7 +96,7 @@ int main(int argc, char* argv[]){
     if(!imgClient.isContinuous()){
         imgClient = imgClient.clone();
     }
-    **/
+    printf("height = %d, width = %d\n", height, width);
     int nbytes, cnt = 1, num = 0;
     while(1){
         /*Receive message from receiver and sender*/
