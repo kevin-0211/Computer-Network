@@ -20,4 +20,4 @@ agent: $(AGENT)
 .PHONY: clean
 
 clean:
-	rm $(RECV) $(SEND) $(AGENT)
+	rm $(RECV) $(SEND) $(AGN)
