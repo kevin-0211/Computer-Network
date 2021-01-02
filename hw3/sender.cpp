@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
         cap >> imgServer;
         if (imgServer.empty())
             break;
-        cout << imgServer.data << endl;
+        
         int tmp = 0;
         while (1) {
             for (i = 0; i < window; i++) {
@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
                     memcpy(s_tmp.data, &imgServer[tmp*4096], 4096);   
                     s_tmp.head.length = 4096;
                 }
-                cout << s_tmp.data << endl;
+                
                 s_tmp.head.seqNumber = cnt;
                 s_tmp.head.fin = 0;
                 s_tmp.head.ack = 0;
