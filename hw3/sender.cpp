@@ -122,14 +122,14 @@ int main(int argc, char* argv[]) {
                     break;
                 memset(&s_tmp, 0, sizeof(s_tmp));
                 if (tmp == frame - 1) {
-                    memcpy(s_tmp.data, &imgServer.data[tmp*4096], rest);    
+                    memcpy(s_tmp.data, &imgServer.data[tmp*4096], sizeof(uchar) * rest);    
                     s_tmp.head.length = rest;
                 }
                 else {
-                    memcpy(s_tmp.data, &imgServer.data[tmp*4096], 4096);    
+                    memcpy(s_tmp.data, &imgServer.data[tmp*4096], sizeof(uchar) * 4096);    
                     s_tmp.head.length = 4096;
                 }
-                cout << s_tmp.data << endl;
+                
                 s_tmp.head.seqNumber = cnt;
                 s_tmp.head.fin = 0;
                 s_tmp.head.ack = 0;
