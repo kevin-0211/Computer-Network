@@ -105,7 +105,7 @@ int main(int argc, char* argv[]){
             for (int x = 0; x < 540; x++)
                 for (int y = 0; y < 960; y++)
                     for (int z = 0; z < 3; z++)
-                        imgClient.at<Vec3b>(i, j)[k] = buf[x*width*3+y*3+z];
+                        imgClient.at<Vec3b>(x, y)[z] = buf[x*width*3+y*3+z];
             imshow("Video", imgClient); 
             tmp = 0;
         }
