@@ -86,9 +86,9 @@ int main(int argc, char* argv[]){
     int segment_size, index;
     srand(time(NULL));
 
-    
+    int height = 540, width = 960;
     Mat imgClient;
-    imgClient = Mat::zeros(540, 960, CV_8UC3);
+    imgClient = Mat::zeros(height, width, CV_8UC3);
 
     int imgSize = imgClient.total() * imgClient.elemSize();
 
@@ -102,8 +102,8 @@ int main(int argc, char* argv[]){
     while(1){
         /*Receive message from receiver and sender*/
         if (num % frame == 0) {
-            for (int x = 0; x < 540; x++)
-                for (int y = 0; y < 960; y++)
+            for (int x = 0; x < height; x++)
+                for (int y = 0; y < width; y++)
                     for (int z = 0; z < 3; z++)
                         imgClient.at<Vec3b>(x, y)[z] = buf[x*width*3+y*3+z];
             imshow("Video", imgClient); 
