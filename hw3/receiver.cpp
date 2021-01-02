@@ -118,7 +118,7 @@ int main(int argc, char* argv[]){
             cnt = s_tmp.head.seqNumber;
             if (cnt == num + 1) {
                 tmp = cnt % frame - 1;
-                memcpy(imgClient.data[tmp*4096], s_tmp.data, 4096);
+                memcpy(&imgClient.data[tmp*4096], s_tmp.data, 4096);
                 printf("recv	data	#%d\n", cnt);
                 memset(&s_tmp, 0, sizeof(s_tmp));
                 s_tmp.head.ack = 1;
