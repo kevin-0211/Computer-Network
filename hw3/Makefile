@@ -8,7 +8,7 @@ RECV = receiver
 SEND = sender
 AGN = agent
 
-all: server client agent
+all: sender receiver agent
   
 sender: $(SENDER)
 	$(CC) $(SENDER) -o $(SEND)  $(OPENCV) 
