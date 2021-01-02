@@ -101,8 +101,8 @@ int main(int argc, char* argv[]) {
     }
 
 
-    int recv, nbytes, cnt = 1, window = 1, num, i, j;
-    int frame = imgSize / 4096 + 1;
+    int recv, nbytes, cnt = 1, window = 1, tmp = 0, num, i, j;
+    int frame = imgSize / 4096 + 1, rest = imgSize - (frame - 1) * 4096;
     
     struct timeval tv;
     tv.tv_sec = 0;
@@ -116,14 +116,19 @@ int main(int argc, char* argv[]) {
         if (imgServer.empty())
             break;
 
-        int tmp = 0;
         while (1) {
             for (i = 0; i < window; i++) {
                 if (cnt % frame == 1 && cnt > 1)
                     break;
                 memset(&s_tmp, 0, sizeof(s_tmp));
-                memcpy(s_tmp.data, &imgServer.data[tmp*4096], 4096);    
-                s_tmp.head.length = 4096;
+                if (cnt % frame == 0 && cnt > 0) {
+                    memcpy(s_tmp.data, &imgServer.data[tmp*4096], rest);    
+                    s_tmp.head.length = rest;
+                }
+                else {
+                    memcpy(s_tmp.data, &imgServer.data[tmp*4096], 4096);    
+                    s_tmp.head.length = 4096;
+                }
                 s_tmp.head.seqNumber = cnt;
                 s_tmp.head.fin = 0;
                 s_tmp.head.ack = 0;
