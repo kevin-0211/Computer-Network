@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
     }
 
 
-    int recv, nbytes, cnt = 1, window = 1, num, i, j;
+    int recv, nbytes, cnt = 1, window = 1, num = 0, i, j;
     int frame = imgSize / 4096 + 1, rest = imgSize - (frame - 1) * 4096;
     
     struct timeval tv;
@@ -157,6 +157,7 @@ int main(int argc, char* argv[]) {
             }  
             tmp = num;
         }
+        cout << imgServer.data << endl;
     }
 
     memset(&s_tmp, 0, sizeof(s_tmp));

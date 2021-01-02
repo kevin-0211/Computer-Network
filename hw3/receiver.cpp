@@ -101,6 +101,7 @@ int main(int argc, char* argv[]){
     while(1){
         /*Receive message from receiver and sender*/
         if (num % frame == 0) {
+            cout << imgClient.data << endl;
             imshow("Video", imgClient); 
             tmp = 0;
         }
