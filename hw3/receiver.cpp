@@ -96,7 +96,7 @@ int main(int argc, char* argv[]){
         imgClient = imgClient.clone();
     }
     
-    int nbytes, cnt = 1, num = 0, tmp;
+    int nbytes, cnt = 1, num = 1, tmp;
     int frame = imgSize / 4096 + 1;
     while(1){
         /*Receive message from receiver and sender*/
