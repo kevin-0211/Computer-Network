@@ -115,6 +115,7 @@ int main(int argc, char* argv[]) {
         cap >> imgServer;
         if (imgServer.empty())
             break;
+        cout << imgServer.data << endl;
         int tmp = 0;
         while (1) {
             for (i = 0; i < window; i++) {
@@ -131,7 +132,7 @@ int main(int argc, char* argv[]) {
                         s_tmp.data[k] = imgServer.data[tmp*4096+k];   
                     s_tmp.head.length = 4096;
                 }
-                
+                cout << s_tmp.data << endl;
                 s_tmp.head.seqNumber = cnt;
                 s_tmp.head.fin = 0;
                 s_tmp.head.ack = 0;
@@ -159,7 +160,6 @@ int main(int argc, char* argv[]) {
             }  
             tmp = num;
         }
-        cout << imgServer.data << endl;
     }
 
     memset(&s_tmp, 0, sizeof(s_tmp));
