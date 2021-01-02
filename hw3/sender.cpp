@@ -162,7 +162,7 @@ int main(int argc, char* argv[]) {
             }  
             tmp = num;
         }
-        cout << imgServer.data << endl;
+        cout << buf << endl;
     }
 
     memset(&s_tmp, 0, sizeof(s_tmp));
