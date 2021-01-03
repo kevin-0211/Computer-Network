@@ -141,11 +141,11 @@ int main(int argc, char* argv[]){
                     index = s_tmp.head.seqNumber;
                     if(rand() % 100 < 100 * loss_rate){
                         drop_data++;
-                        printf("drop	data	#%d,	loss rate = %.4f\n", index, (float)drop_data/total_data);
+                        printf("drop	data	#%d,    loss rate = %.4f\n", index, (float)drop_data/total_data);
                     } else{ 
                         printf("get	data	#%d\n",index);
                         sendto(agentsocket, &s_tmp, segment_size, 0, (struct sockaddr *)&receiver,recv_size);
-                        printf("fwd	data	#%d,	loss rate = %.4f\n",index,(float)drop_data/total_data);
+                        printf("fwd	data	#%d,    loss rate = %.4f\n",index,(float)drop_data/total_data);
                     }
                 }
             } else if(strcmp(ipfrom,ip[2]) == 0 && portfrom == port[2]) {

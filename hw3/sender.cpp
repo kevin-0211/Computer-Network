@@ -153,7 +153,7 @@ int main(int argc, char* argv[]) {
                 recv = recvfrom(sendersocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&tmp_addr, &tmp_size);
                 if (recv < 0)
                     break;
-                printf("recv     ack	#%d\n", s_tmp.head.ackNumber);
+                printf("recv    ack	#%d\n", s_tmp.head.ackNumber);
                 num = s_tmp.head.ackNumber;
             }
             if (j < i) {
@@ -161,7 +161,7 @@ int main(int argc, char* argv[]) {
                     threshold = window / 2;
                 else 
                     threshold = 1;
-                printf("time     out,             threshold = %d\n", threshold);
+                printf("time    out,            threshold = %d\n", threshold);
                 window = 1;
                 cnt = num+1;
                 flag = 0;
