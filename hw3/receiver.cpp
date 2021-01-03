@@ -87,7 +87,7 @@ int main(int argc, char* argv[]){
     srand(time(NULL));
 
     int height = 540, width = 960;
-    VideoCapture cap("./send/tmp.mpg");
+    VideoCapture cap("./tmp.mpg");
     Mat imgClient;
     imgClient = Mat::zeros(height, width, CV_8UC3);
 
