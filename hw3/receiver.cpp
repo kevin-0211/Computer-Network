@@ -86,7 +86,8 @@ int main(int argc, char* argv[]){
     int segment_size, index;
     srand(time(NULL));
 
-    int height = 720, width = 1080;
+    int height = 540, width = 960;
+    VideoCapture cap("./send/tmp.mpg");
     Mat imgClient;
     imgClient = Mat::zeros(height, width, CV_8UC3);
 
@@ -141,6 +142,7 @@ int main(int argc, char* argv[]){
         }
         if (tmp % frame == frame-1) {
             memcpy(iptr, buf, imgSize);
+            cap >> imgClient;
             imshow("Video", imgClient); 
             tmp = 0;
         }
