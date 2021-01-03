@@ -146,7 +146,7 @@ int main(int argc, char* argv[]){
             uchar *iptr = imgClient.data;
             memcpy(iptr, buf, imgSize);
             imshow("Video", imgClient); 
-            char c = (char)waitKey(0);
+            char c = (char)waitKey(0.1);
             if(c==27)
                 break;
         }
