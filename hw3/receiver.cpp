@@ -101,15 +101,6 @@ int main(int argc, char* argv[]){
     uchar *buf = new uchar[imgSize];
     while(1){
         /*Receive message from receiver and sender*/
-        if (num % frame == 0) {
-            for (int x = 0; x < height; x++)
-                for (int y = 0; y < width; y++)
-                    for (int z = 0; z < 3; z++)
-                        imgClient.at<Vec3b>(x, y)[z] = buf[x*width*3+y*3+z];
-            cout << buf << endl;
-            imshow("Video", imgClient); 
-            tmp = 0;
-        }
         memset(&s_tmp, 0, sizeof(s_tmp));
         segment_size = recvfrom(receiversocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&tmp_addr, &tmp_size);
         
@@ -125,7 +116,8 @@ int main(int argc, char* argv[]){
             }
             cnt = s_tmp.head.seqNumber;
             if (cnt == num + 1) {
-                memcpy(&buf[tmp*4096], s_tmp.data, s_tmp.head.length);
+                tmp = cnt - 1;
+                memcpy(&buf[(tmp%frame)*4096], s_tmp.data, s_tmp.head.length);
                 printf("recv	data	#%d\n", cnt);
                 memset(&s_tmp, 0, sizeof(s_tmp));
                 s_tmp.head.ack = 1;
@@ -134,7 +126,6 @@ int main(int argc, char* argv[]){
                 sendto(receiversocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&agent, agent_size);
                 printf("send	ack 	#%d\n", s_tmp.head.ackNumber);
                 num = cnt;
-                tmp += 1;
             }
             else {
                 printf("drop	data	#%d\n", cnt);
@@ -145,6 +136,14 @@ int main(int argc, char* argv[]){
                 sendto(receiversocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&agent, agent_size);
                 printf("send	ack 	#%d\n", s_tmp.head.ackNumber);
             }
+        }
+        if (tmp % frame == frame-1) {
+            for (int x = 0; x < height; x++)
+                for (int y = 0; y < width; y++)
+                    for (int z = 0; z < 3; z++)
+                        imgClient.at<Vec3b>(x, y)[z] = buf[x*width*3+y*3+z];
+            cout << buf << endl;
+            imshow("Video", imgClient); 
         }
     }
     destroyAllWindows();

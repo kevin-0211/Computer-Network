@@ -126,12 +126,12 @@ int main(int argc, char* argv[]) {
                 if (tmp % frame == 0 && tmp > 0)
                     break;
                 memset(&s_tmp, 0, sizeof(s_tmp));
-                if (tmp == frame - 1) {
-                    memcpy(s_tmp.data, &buf[tmp*4096], rest);
+                if (tmp % frame == frame - 1) {
+                    memcpy(s_tmp.data, &buf[(tmp%frame)*4096], rest);
                     s_tmp.head.length = rest;
                 }
                 else {
-                    memcpy(s_tmp.data, &buf[tmp*4096], 4096);   
+                    memcpy(s_tmp.data, &buf[(tmp%frame)*4096], 4096);   
                     s_tmp.head.length = 4096;
                 }
                 
@@ -162,7 +162,6 @@ int main(int argc, char* argv[]) {
             }  
             tmp = num;
         }
-        cout << buf << endl;
     }
 
     memset(&s_tmp, 0, sizeof(s_tmp));
