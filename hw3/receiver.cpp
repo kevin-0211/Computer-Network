@@ -96,7 +96,7 @@ int main(int argc, char* argv[]){
         imgClient = imgClient.clone();
     }
     
-    int cnt = 1, num = 0, tmp = 0;
+    int cnt = 1, num = 0;
     int frame = imgSize / 4096 + 1;
     uchar *buf = new uchar[imgSize];
     while(1){
@@ -116,8 +116,7 @@ int main(int argc, char* argv[]){
             }
             cnt = s_tmp.head.seqNumber;
             if (cnt == num + 1) {
-                tmp = cnt - 1;
-                memcpy(&buf[(tmp%frame)*4096], &s_tmp.data, s_tmp.head.length);
+                memcpy(&buf[(num % frame) * 4096], &s_tmp.data, s_tmp.head.length);
                 printf("recv	data	#%d\n", cnt);
                 memset(&s_tmp, 0, sizeof(s_tmp));
                 s_tmp.head.ack = 1;
@@ -137,11 +136,10 @@ int main(int argc, char* argv[]){
                 printf("send	ack 	#%d\n", s_tmp.head.ackNumber);
             }
         }
-        if (tmp % frame == frame-1) {
+        if (num % frame == 0 && num > 0) {
             uchar *iptr = imgClient.data;
             memcpy(iptr, buf, imgSize);
             imshow("Video", imgClient); 
-            tmp = 0;
         }
         char c = (char)waitKey(33.3333);
         if(c==27)
