@@ -117,6 +117,7 @@ int main(int argc, char* argv[]){
             cnt = s_tmp.head.seqNumber;
             if (cnt == num + 1) {
                 tmp = cnt - 1;
+                cout << s_tmp.data << endl;
                 memcpy(&buf[(tmp%frame)*4096], s_tmp.data, s_tmp.head.length);
                 printf("recv	data	#%d\n", cnt);
                 memset(&s_tmp, 0, sizeof(s_tmp));
