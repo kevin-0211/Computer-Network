@@ -133,7 +133,6 @@ int main(int argc, char* argv[]) {
                 else {
                     memcpy(s_tmp.data, &buf[(tmp%frame)*4096], 4096);   
                     s_tmp.head.length = 4096;
-                    cout << s_tmp.data << endl;
                 }
                 
                 s_tmp.head.seqNumber = cnt;
