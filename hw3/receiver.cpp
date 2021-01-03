@@ -102,11 +102,11 @@ int main(int argc, char* argv[]){
         imgClient = imgClient.clone();
     }
     
-    int cnt = 1, num = 0;
+    int cnt = 1, num = 0, buf_cnt = 0;
     int frame = imgSize / 4096 + 1;
     uchar *buf = new uchar[imgSize];
+    uchar *buffer = new uchar[32 * 4096];
     while(1){
-        /*Receive message from receiver and sender*/
         memset(&s_tmp, 0, sizeof(s_tmp));
         segment_size = recvfrom(receiversocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&tmp_addr, &tmp_size);
         

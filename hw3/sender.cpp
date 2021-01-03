@@ -143,7 +143,7 @@ int main(int argc, char* argv[]) {
                 s_tmp.head.fin = 0;
                 s_tmp.head.ack = 0;
                 sendto(sendersocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&agent, agent_size);
-                printf("send	data	#%d,	winSize = %d\n", cnt, window);
+                printf("send	data	#%d,    winSize = %d\n", cnt, window);
                 if (cnt % frame == 0)
                     flag = 1;
                 cnt += 1;
