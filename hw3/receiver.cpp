@@ -146,6 +146,9 @@ int main(int argc, char* argv[]){
             imshow("Video", imgClient); 
             tmp = 0;
         }
+        char c = (char)waitKey(33.3333);
+        if(c==27)
+                break;
     }
     destroyAllWindows();
     return 0;
