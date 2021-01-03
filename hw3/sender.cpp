@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
         imgServer = imgServer.clone();
     }
 
-    int recv, flag, cnt = 1, window = 1, num = 0, i, j;
+    int recv, flag, cnt = 1, window = 1, threshold = 16, num = 0, i, j;
     int frame = imgSize / 4096 + 1, rest = imgSize - (frame - 1) * 4096;
     
     struct timeval tv;
@@ -123,12 +123,7 @@ int main(int argc, char* argv[]) {
         if (imgServer.empty())
             break;
         memcpy(buf, imgServer.data, imgSize);
-        /**
-        for (int x = 0; x < height; x++)
-            for (int y = 0; y < width; y++)
-                for (int z = 0; z < 3; z++) 
-                    buf[x*width*3+y*3+z] = imgServer.at<Vec3b>(x, y)[z];
-        **/
+       
         flag = 0;
         while (1) {
             for (i = 0; i < window; i++) {
@@ -148,7 +143,7 @@ int main(int argc, char* argv[]) {
                 s_tmp.head.fin = 0;
                 s_tmp.head.ack = 0;
                 sendto(sendersocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&agent, agent_size);
-                printf("send	data	#%d\n", cnt);
+                printf("send	data	#%d,	winSize = %d\n", cnt, window);
                 if (cnt % frame == 0)
                     flag = 1;
                 cnt += 1;
@@ -162,12 +157,20 @@ int main(int argc, char* argv[]) {
                 num = s_tmp.head.ackNumber;
             }
             if (j < i) {
+                if (window / 2 > 1)
+                    threshold = window / 2;
+                else 
+                    threshold = 1;
+                printf("time    out,            threshold = %d\n", threshold);
                 window = 1;
                 cnt = num+1;
                 flag = 0;
             }
             else {
-                window += 1;
+                if (window < threshold)
+                    window *= 2;
+                else
+                    window += 1;
                 if (flag == 1)
                     break;
             }  
