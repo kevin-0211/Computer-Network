@@ -86,7 +86,7 @@ int main(int argc, char* argv[]){
     int segment_size, index;
     srand(time(NULL));
 
-    int height = 540, width = 960;
+    int height = 720, width = 1080;
     Mat imgClient;
     imgClient = Mat::zeros(height, width, CV_8UC3);
 
