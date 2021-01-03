@@ -100,12 +100,12 @@ int main(int argc, char* argv[]) {
     }
 
 
-    int recv, nbytes, cnt = 1, window = 1, num = 0, i, j;
+    int recv, flag, cnt = 1, window = 1, num = 0, i, j;
     int frame = imgSize / 4096 + 1, rest = imgSize - (frame - 1) * 4096;
     
     struct timeval tv;
     tv.tv_sec = 0;
-    tv.tv_usec = 100;
+    tv.tv_usec = 1000;
     if (setsockopt(sendersocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
         perror("Error");
     }
@@ -119,18 +119,18 @@ int main(int argc, char* argv[]) {
             for (int y = 0; y < width; y++)
                 for (int z = 0; z < 3; z++) 
                     buf[x*width*3+y*3+z] = imgServer.at<Vec3b>(x, y)[z];
-        int tmp = 0;
+        flag = 0;
         while (1) {
             for (i = 0; i < window; i++) {
-                if (tmp % frame == 0 && tmp > 0)
+                if (flag == 1)
                     break;
                 memset(&s_tmp, 0, sizeof(s_tmp));
-                if (tmp % frame == frame - 1) {
-                    memcpy(&s_tmp.data, &buf[(tmp%frame)*4096], rest);
+                if (cnt % frame == 0) {
+                    memcpy(&s_tmp.data, &buf[((cnt-1)%frame)*4096], rest);
                     s_tmp.head.length = rest;
                 }
                 else {
-                    memcpy(&s_tmp.data, &buf[(tmp%frame)*4096], 4096);   
+                    memcpy(&s_tmp.data, &buf[((cnt-1)%frame)*4096], 4096);   
                     s_tmp.head.length = 4096;
                 }
                 
@@ -139,8 +139,9 @@ int main(int argc, char* argv[]) {
                 s_tmp.head.ack = 0;
                 sendto(sendersocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&agent, agent_size);
                 printf("send	data	#%d\n", cnt);
+                if (cnt % frame == 0)
+                    flag = 1;
                 cnt += 1;
-                tmp += 1;
             }
             for (j = 0; j < i; j++) {
                 memset(&s_tmp, 0, sizeof(s_tmp));
@@ -153,13 +154,13 @@ int main(int argc, char* argv[]) {
             if (j < i) {
                 window = 1;
                 cnt = num+1;
+                flag = 0;
             }
             else {
                 window += 1;
-                if (tmp % frame == 0 && tmp > 0)
+                if (flag == 1)
                     break;
             }  
-            tmp = num;
         }
     }
     cap.release();
