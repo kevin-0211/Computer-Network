@@ -82,12 +82,10 @@ int main(int argc, char* argv[]) {
     printf("可以開始測囉^Q^\n");
     printf("sender info: ip = %s port = %d\n",ip[0], port[0]);
     printf("agent info: ip = %s port = %d\n", ip[1], port[1]);
-
-    
+   
     int segment_size, index;
     srand(time(NULL));
-    
-    
+       
     VideoCapture cap(filename);
     if(cap.isOpened() == false) {
         cout << "cannot open the video file" <<endl;
@@ -104,12 +102,10 @@ int main(int argc, char* argv[]) {
     s_tmp.head.seqNumber = height;
     s_tmp.head.ackNumber = width;
     sendto(sendersocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&agent, agent_size);
-
     
     if (!imgServer.isContinuous()) {
         imgServer = imgServer.clone();
     }
-
 
     int recv, flag, cnt = 1, window = 1, num = 0, i, j;
     int frame = imgSize / 4096 + 1, rest = imgSize - (frame - 1) * 4096;
@@ -126,10 +122,13 @@ int main(int argc, char* argv[]) {
         cap >> imgServer;
         if (imgServer.empty())
             break;
+        memcpy(buf, imgServer.data, imgSize);
+        /**
         for (int x = 0; x < height; x++)
             for (int y = 0; y < width; y++)
                 for (int z = 0; z < 3; z++) 
                     buf[x*width*3+y*3+z] = imgServer.at<Vec3b>(x, y)[z];
+        **/
         flag = 0;
         while (1) {
             for (i = 0; i < window; i++) {
