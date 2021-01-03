@@ -144,6 +144,7 @@ int main(int argc, char* argv[]){
                         imgClient.at<Vec3b>(x, y)[z] = buf[x*width*3+y*3+z];
             cout << buf << endl;
             imshow("Video", imgClient); 
+            tmp = 0;
         }
     }
     destroyAllWindows();
