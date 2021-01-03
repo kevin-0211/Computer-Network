@@ -138,6 +138,10 @@ int main(int argc, char* argv[]){
             }
         }
         if (tmp % frame == frame-1) {
+            for (int x = 0; x < height; x++)
+                for (int y = 0; y < width; y++)
+                    for (int z = 0; z < 3; z++) 
+                        cout << buf[x*width*3+y*3+z]; 
             uchar *iptr = imgClient.data;
             memcpy(iptr,buf,imgSize);
             imshow("Video", imgClient); 

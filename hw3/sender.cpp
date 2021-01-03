@@ -102,7 +102,6 @@ int main(int argc, char* argv[]) {
 
     int recv, nbytes, cnt = 1, window = 1, num = 0, i, j;
     int frame = imgSize / 4096 + 1, rest = imgSize - (frame - 1) * 4096;
-    printf("rest = %d\n", rest);
     
     struct timeval tv;
     tv.tv_sec = 0;
@@ -118,9 +117,12 @@ int main(int argc, char* argv[]) {
             break;
         for (int x = 0; x < height; x++)
             for (int y = 0; y < width; y++)
-                for (int z = 0; z < 3; z++)
+                for (int z = 0; z < 3; z++) 
                     buf[x*width*3+y*3+z] = imgServer.at<Vec3b>(x, y)[z];
-        
+        for (int x = 0; x < height; x++)
+            for (int y = 0; y < width; y++)
+                for (int z = 0; z < 3; z++) 
+                    cout << buf[x*width*3+y*3+z]; 
         int tmp = 0;
         while (1) {
             for (i = 0; i < window; i++) {
