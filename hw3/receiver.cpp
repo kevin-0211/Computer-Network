@@ -100,6 +100,7 @@ int main(int argc, char* argv[]){
     int frame = imgSize / 4096 + 1;
     uchar *buf = new uchar[imgSize];
     uchar *iptr = imgClient.data;
+    imshow("Video", imgClient); 
     while(1){
         /*Receive message from receiver and sender*/
         memset(&s_tmp, 0, sizeof(s_tmp));
