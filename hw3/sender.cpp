@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
     
     struct timeval tv;
     tv.tv_sec = 0;
-    tv.tv_usec = 100000;
+    tv.tv_usec = 100;
     if (setsockopt(sendersocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
         perror("Error");
     }
@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) {
             tmp = num;
         }
     }
-
+    cap.release();
     memset(&s_tmp, 0, sizeof(s_tmp));
     s_tmp.head.fin = 1;
     s_tmp.head.ack = 0;
