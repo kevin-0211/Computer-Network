@@ -119,10 +119,6 @@ int main(int argc, char* argv[]) {
             for (int y = 0; y < width; y++)
                 for (int z = 0; z < 3; z++) 
                     buf[x*width*3+y*3+z] = imgServer.at<Vec3b>(x, y)[z];
-        for (int x = 0; x < height; x++)
-            for (int y = 0; y < width; y++)
-                for (int z = 0; z < 3; z++) 
-                    cout << buf[x*width*3+y*3+z]; 
         int tmp = 0;
         while (1) {
             for (i = 0; i < window; i++) {
@@ -130,11 +126,11 @@ int main(int argc, char* argv[]) {
                     break;
                 memset(&s_tmp, 0, sizeof(s_tmp));
                 if (tmp % frame == frame - 1) {
-                    memcpy(s_tmp.data, &buf[(tmp%frame)*4096], rest);
+                    memcpy(&s_tmp.data, &buf[(tmp%frame)*4096], rest);
                     s_tmp.head.length = rest;
                 }
                 else {
-                    memcpy(s_tmp.data, &buf[(tmp%frame)*4096], 4096);   
+                    memcpy(&s_tmp.data, &buf[(tmp%frame)*4096], 4096);   
                     s_tmp.head.length = 4096;
                 }
                 
