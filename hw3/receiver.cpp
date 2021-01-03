@@ -99,6 +99,7 @@ int main(int argc, char* argv[]){
     int cnt = 1, num = 0, tmp = 0;
     int frame = imgSize / 4096 + 1;
     uchar *buf = new uchar[imgSize];
+    uchar *iptr = imgClient.data;
     while(1){
         /*Receive message from receiver and sender*/
         memset(&s_tmp, 0, sizeof(s_tmp));
@@ -138,7 +139,6 @@ int main(int argc, char* argv[]){
             }
         }
         if (tmp % frame == frame-1) {
-            uchar *iptr = imgClient.data;
             memcpy(iptr, buf, imgSize);
             imshow("Video", imgClient); 
             tmp = 0;
