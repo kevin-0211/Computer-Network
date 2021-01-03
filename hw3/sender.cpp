@@ -161,7 +161,7 @@ int main(int argc, char* argv[]) {
                     threshold = window / 2;
                 else 
                     threshold = 1;
-                printf("time    out,            threshold = %d\n", threshold);
+                printf("time     out,             threshold = %d\n", threshold);
                 window = 1;
                 cnt = num+1;
                 flag = 0;
