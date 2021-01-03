@@ -86,7 +86,13 @@ int main(int argc, char* argv[]){
     int segment_size, index;
     srand(time(NULL));
 
-    int height = 540, width = 960;
+    memset(&s_tmp, 0, sizeof(s_tmp));
+    segment_size = recvfrom(receiversocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&tmp_addr, &tmp_size);
+    
+    int height, width;
+    height = s_tmp.head.seqNumber;
+    width = s_tmp.head.ackNumber;
+
     Mat imgClient;
     imgClient = Mat::zeros(height, width, CV_8UC3);
 
@@ -140,7 +146,7 @@ int main(int argc, char* argv[]){
             uchar *iptr = imgClient.data;
             memcpy(iptr, buf, imgSize);
             imshow("Video", imgClient); 
-            char c = (char)waitKey(1);
+            char c = (char)waitKey(0);
             if(c==27)
                 break;
         }

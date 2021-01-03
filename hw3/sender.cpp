@@ -89,11 +89,22 @@ int main(int argc, char* argv[]) {
     
     
     VideoCapture cap(filename);
+    if(cap.isOpened() == false) {
+        cout << "cannot open the video file" <<endl;
+        return -1;
+    }
+
     int width = cap.get(CV_CAP_PROP_FRAME_WIDTH);
     int height = cap.get(CV_CAP_PROP_FRAME_HEIGHT);
     Mat imgServer;
     imgServer = Mat::zeros(height, width, CV_8UC3);
     int imgSize = imgServer.total() * imgServer.elemSize();
+
+    memset(&s_tmp, 0, sizeof(s_tmp));
+    s_tmp.head.seqNumber = height;
+    s_tmp.head.ackNumber = width;
+    sendto(sendersocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&agent, agent_size);
+
     
     if (!imgServer.isContinuous()) {
         imgServer = imgServer.clone();
@@ -105,7 +116,7 @@ int main(int argc, char* argv[]) {
     
     struct timeval tv;
     tv.tv_sec = 0;
-    tv.tv_usec = 1000;
+    tv.tv_usec = 100;
     if (setsockopt(sendersocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
         perror("Error");
     }

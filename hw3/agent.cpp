@@ -112,6 +112,11 @@ int main(int argc, char* argv[]){
     char *ptr;
     int portfrom;
     srand(time(NULL));
+
+    memset(&s_tmp, 0, sizeof(s_tmp));
+    segment_size = recvfrom(agentsocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&tmp_addr, &tmp_size);
+    sendto(agentsocket, &s_tmp, segment_size, 0, (struct sockaddr *)&receiver,recv_size);
+
     while(1){
         /*Receive message from receiver and sender*/
         memset(&s_tmp, 0, sizeof(s_tmp));
