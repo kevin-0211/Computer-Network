@@ -96,7 +96,7 @@ int main(int argc, char* argv[]){
         imgClient = imgClient.clone();
     }
     
-    int nbytes, cnt = 1, num = 1, tmp = 0;
+    int nbytes, cnt = 1, num = 0, tmp = 0;
     int frame = imgSize / 4096 + 1;
     uchar *buf = new uchar[imgSize];
     while(1){
