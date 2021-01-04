@@ -158,6 +158,7 @@ int main(int argc, char* argv[]){
                 buf_cnt = 0;
                 flush = 0;
                 flush_cnt += 1;
+                printf("flush\n");
             }
             
         }
