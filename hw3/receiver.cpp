@@ -102,7 +102,7 @@ int main(int argc, char* argv[]){
         imgClient = imgClient.clone();
     }
     
-    int cnt = 1, num = 0, buf_cnt = 0;
+    int cnt = 1, num = 0, buf_cnt = 0, buf_len = 0, flush = 0, flush_cnt = 0;
     int frame = imgSize / 4096 + 1;
     uchar *buf = new uchar[imgSize];
     uchar *buffer = new uchar[32 * 4096];
@@ -121,7 +121,14 @@ int main(int argc, char* argv[]){
                 break;
             }
             cnt = s_tmp.head.seqNumber;
-            if (cnt == num + 1) {
+            // if (s_tmp.head.syn == 1 && buf_cnt == 32)
+            //    flush = 1;
+
+            if (cnt == num + 1 && buf_cnt < 32) {
+                // memcpy(&buffer[buf_cnt * 4096], &s_tmp.data, s_tmp.head.length);
+                // buf_cnt += 1;
+                // buf_len += s_tmp.head.length;
+
                 memcpy(&buf[(num % frame) * 4096], &s_tmp.data, s_tmp.head.length);
                 printf("recv	data	#%d\n", cnt);
                 memset(&s_tmp, 0, sizeof(s_tmp));
@@ -141,8 +148,20 @@ int main(int argc, char* argv[]){
                 sendto(receiversocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&agent, agent_size);
                 printf("send	ack 	#%d\n", s_tmp.head.ackNumber);
             }
+            /**
+            if (num % frame == 0 && num > 0)
+                flush = 1;
+            if (flush == 1) {
+                memcpy(&buf[flush_cnt * 32 * 4096], &buffer, buf_len);
+                buf_len = 0;
+                buf_cnt = 0;
+                flush = 0;
+                flush_cnt += 1;
+            }
+            **/
         }
         if (num % frame == 0 && num > 0) {
+            // flush_cnt = 0;
             uchar *iptr = imgClient.data;
             memcpy(iptr, buf, imgSize);
             imshow("Video", imgClient); 

@@ -138,7 +138,10 @@ int main(int argc, char* argv[]) {
                     memcpy(&s_tmp.data, &buf[((cnt-1)%frame)*4096], 4096);   
                     s_tmp.head.length = 4096;
                 }
-                
+                if (cnt % frame == 0 || i == window-1)
+                    s_tmp.head.syn = 1;
+                else
+                    s_tmp.head.syn = 0;
                 s_tmp.head.seqNumber = cnt;
                 s_tmp.head.fin = 0;
                 s_tmp.head.ack = 0;
