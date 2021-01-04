@@ -184,9 +184,8 @@ int main(int argc, char* argv[]) {
     s_tmp.head.fin = 1;
     s_tmp.head.ack = 0;
     sendto(sendersocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&agent, agent_size);
-    printf("send	 fin\n");
+    printf("send    fin\n");
     recvfrom(sendersocket, &s_tmp, sizeof(s_tmp), 0, (struct sockaddr *)&tmp_addr, &tmp_size);
-    if (s_tmp.head.fin == 1 && s_tmp.head.ack == 1)
-        printf("recv	 finack\n");
+    printf("recv    finack\n");
     return 0;
 }
