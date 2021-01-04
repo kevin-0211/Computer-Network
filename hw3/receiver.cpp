@@ -129,7 +129,6 @@ int main(int argc, char* argv[]){
                 buf_cnt += 1;
                 buf_len += s_tmp.head.length;
 
-                // memcpy(&buf[(num % frame) * 4096], &s_tmp.data, s_tmp.head.length);
                 printf("recv	data	#%d\n", cnt);
                 memset(&s_tmp, 0, sizeof(s_tmp));
                 s_tmp.head.ack = 1;
