@@ -151,8 +151,9 @@ int main(int argc, char* argv[]){
             
             if (num % frame == 0 && num > 0)
                 flush = 1;
+            
             if (flush == 1) {
-                memcpy(&buf[flush_cnt * 32 * 4096], &buffer, buf_len);
+                memcpy(&buf[flush_cnt * 32 * 4096], buffer, buf_len);
                 buf_len = 0;
                 buf_cnt = 0;
                 flush = 0;
